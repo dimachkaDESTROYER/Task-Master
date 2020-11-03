@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "UvWcKy9Tii2/IingOkkt3Cm8llvdEesJrLAjbUB6OJO/9aJZvRuIGp+q4oROM7iocmjH8ISXQMR5gfI7itbexw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\kolos\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\kolos\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
