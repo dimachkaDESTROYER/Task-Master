@@ -2,5 +2,9 @@
 {
     public enum TaskState
     {
+        Done,
+        NotTaken,
+        InProcess,
+        Canceled,
     }
 }
