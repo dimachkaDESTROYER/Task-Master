@@ -1,9 +1,0 @@
-C:\Users\kolos\Desktop\Task-Master\TaskMaster\bin\Debug\netstandard2.0\TaskMaster.deps.json
-C:\Users\kolos\Desktop\Task-Master\TaskMaster\bin\Debug\netstandard2.0\TaskMaster.dll
-C:\Users\kolos\Desktop\Task-Master\TaskMaster\bin\Debug\netstandard2.0\TaskMaster.pdb
-C:\Users\kolos\Desktop\Task-Master\TaskMaster\obj\Debug\netstandard2.0\TaskMaster.csprojAssemblyReference.cache
-C:\Users\kolos\Desktop\Task-Master\TaskMaster\obj\Debug\netstandard2.0\TaskMaster.AssemblyInfoInputs.cache
-C:\Users\kolos\Desktop\Task-Master\TaskMaster\obj\Debug\netstandard2.0\TaskMaster.AssemblyInfo.cs
-C:\Users\kolos\Desktop\Task-Master\TaskMaster\obj\Debug\netstandard2.0\TaskMaster.csproj.CoreCompileInputs.cache
-C:\Users\kolos\Desktop\Task-Master\TaskMaster\obj\Debug\netstandard2.0\TaskMaster.dll
-C:\Users\kolos\Desktop\Task-Master\TaskMaster\obj\Debug\netstandard2.0\TaskMaster.pdb

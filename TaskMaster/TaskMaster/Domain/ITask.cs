@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TaskMaster.Domain
 {
-    class TeamTask
+    interface ITask
     {
     }
 }
