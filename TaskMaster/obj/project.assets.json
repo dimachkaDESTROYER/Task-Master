@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster\\TaskMaster.csproj",
+      "projectUniqueName": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster.csproj",
       "projectName": "TaskMaster",
-      "projectPath": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster\\TaskMaster.csproj",
+      "projectPath": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster.csproj",
       "packagesPath": "C:\\Users\\kolos\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster\\obj\\",
+      "outputPath": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\kolos\\AppData\\Roaming\\NuGet\\NuGet.Config",
