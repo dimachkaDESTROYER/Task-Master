@@ -1,21 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster.csproj": {}
+    "C:\\Users\\Олечка\\Desktop\\проект\\Task-Master1\\TaskMaster\\TaskMaster.csproj": {}
   },
   "projects": {
-    "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster.csproj": {
+    "C:\\Users\\Олечка\\Desktop\\проект\\Task-Master1\\TaskMaster\\TaskMaster.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster.csproj",
+        "projectUniqueName": "C:\\Users\\Олечка\\Desktop\\проект\\Task-Master1\\TaskMaster\\TaskMaster.csproj",
         "projectName": "TaskMaster",
-        "projectPath": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster.csproj",
-        "packagesPath": "C:\\Users\\kolos\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\obj\\",
+        "projectPath": "C:\\Users\\Олечка\\Desktop\\проект\\Task-Master1\\TaskMaster\\TaskMaster.csproj",
+        "packagesPath": "C:\\Users\\Олечка\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Олечка\\Desktop\\проект\\Task-Master1\\TaskMaster\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Microsoft\\Xamarin\\NuGet\\",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\kolos\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Олечка\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
@@ -37,6 +42,12 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
+          "dependencies": {
+            "Telegram.Bot": {
+              "target": "Package",
+              "version": "[15.7.1, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -52,7 +63,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
         }
       }
     }

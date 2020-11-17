@@ -1,0 +1,4 @@
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\bin\Debug\netcoreapp3.1\TaskMaster.exe
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\obj\Debug\netcoreapp3.1\TaskMaster.csprojAssemblyReference.cache
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\obj\Debug\netcoreapp3.1\TaskMaster.AssemblyInfoInputs.cache
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\obj\Debug\netcoreapp3.1\TaskMaster.AssemblyInfo.cs
