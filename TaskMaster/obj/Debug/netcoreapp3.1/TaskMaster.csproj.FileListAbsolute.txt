@@ -2,3 +2,13 @@ C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\bin\Debug\net
 C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\obj\Debug\netcoreapp3.1\TaskMaster.csprojAssemblyReference.cache
 C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\obj\Debug\netcoreapp3.1\TaskMaster.AssemblyInfoInputs.cache
 C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\obj\Debug\netcoreapp3.1\TaskMaster.AssemblyInfo.cs
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\bin\Debug\netcoreapp3.1\TaskMaster.deps.json
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\bin\Debug\netcoreapp3.1\TaskMaster.runtimeconfig.json
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\bin\Debug\netcoreapp3.1\TaskMaster.runtimeconfig.dev.json
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\bin\Debug\netcoreapp3.1\TaskMaster.dll
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\bin\Debug\netcoreapp3.1\TaskMaster.pdb
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\bin\Debug\netcoreapp3.1\Telegram.Bot.dll
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\obj\Debug\netcoreapp3.1\TaskMaster.csproj.CopyComplete
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\obj\Debug\netcoreapp3.1\TaskMaster.dll
+C:\Users\Олечка\Desktop\проект\Task-Master1\TaskMaster\obj\Debug\netcoreapp3.1\TaskMaster.pdb
