@@ -6,13 +6,13 @@ namespace TaskMaster.Domain
 {
     class Team : IOwner
     {
+        public ulong Id { get; }
         public HashSet<Person> Persons;
-        public int OwnerId { get; }
         public ICollection<ITask> OwnedTasks { get; }
 
-        public Team(int ownerId)
+        public Team(ulong id)
         {
-            OwnerId = ownerId;
+            Id = id;
         }
 
         public void AddPerson(Person person) => Persons.Add(person);

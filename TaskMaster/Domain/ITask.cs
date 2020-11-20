@@ -7,6 +7,7 @@ namespace TaskMaster
 {
     public interface ITask
     {
+        ulong id { get;}
         string Topic { get; protected set; }
         string Description { get; protected set; }
         TaskState State { get; protected set; }
