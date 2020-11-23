@@ -13,6 +13,7 @@ namespace TaskMaster.Domain
         private DateTime? _finish;
         private DateTime? _deadLine;
         private IPerformer _performer;
+        private int _id;
 
         public SimpleTask(IOwner owner, string topic, string description)
         {
@@ -21,9 +22,10 @@ namespace TaskMaster.Domain
             _description = description;
         }
         //TODO: надо на рефлексию переписать
-        public SimpleTask(IOwner owner, IPerformer performer, string topic, string description, TaskState state,
+        public SimpleTask(int id, IOwner owner, IPerformer performer, string topic, string description, TaskState state,
             DateTime? start, DateTime? finish, DateTime deadline)
         {
+            _id = id;
             Owner = owner;
             _performer = performer;
             _topic = topic;
@@ -34,7 +36,12 @@ namespace TaskMaster.Domain
             _deadLine = deadline;
         }
 
-        public ulong id { get; set; }
+
+        int ITask.Id
+        {
+            get => _id;
+            set => _id = value;
+        }
 
         string ITask.Topic
         {

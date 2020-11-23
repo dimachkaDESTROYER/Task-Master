@@ -19,8 +19,8 @@ namespace TaskMaster
         {
             var owner = db.GetOwner(ownerID);
             var performer = db.GetOwner(performerID);
-            return new SimpleTask(ID, topic, description,
-             state, start, finish, deadLine, performer, owner);
+            return new SimpleTask(ID, owner, performer, topic, description,
+             state, start, finish, deadLine);
         }
     }
 }
