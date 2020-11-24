@@ -4,6 +4,7 @@ namespace TaskMaster
 {
     public interface IPerformer
     {
+        ulong Id { get; }
         ICollection<ITask> TakenTasks { get; }
         ICollection<ITask> DoneTasks { get; }
         public void Take(ITask task)
