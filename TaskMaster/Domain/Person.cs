@@ -10,7 +10,7 @@ namespace TaskMaster
             Id = id;
         }
 
-        public Person(ulong id, HashSet<ITask> takenTasks, HashSet<ITask> doneTasks, HashSet<ITask> ownedTasks)
+        public Person(ulong id, HashSet<ITask> takenTasks, HashSet<ITask> doneTasks, List<ITask> ownedTasks)
         {
             Id = id;
             TakenTasks = takenTasks;

@@ -7,20 +7,15 @@ namespace TaskMaster.Domain
     class Team : IOwner
     {
         public ulong Id { get; }
-<<<<<<< HEAD
-        public HashSet<Person> Persons;
-        public List<ITask> OwnedTasks { get; }
-=======
         public List<Person> Persons { get; }
-        public ICollection<ITask> OwnedTasks { get; } = new HashSet<ITask>();
->>>>>>> ae978c5d94f77141a1442e6997e4e524536c8edc
+        public List<ITask> OwnedTasks { get; } = new List<ITask>();
 
         public Team(ulong id)
         {
             Id = id;
         }
 
-        public Team(ulong id, List<Person> persons, HashSet<ITask> ownedTasks)
+        public Team(ulong id, List<Person> persons, List<ITask> ownedTasks)
         {
             Id = id;
             Persons = persons;
