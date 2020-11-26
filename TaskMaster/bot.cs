@@ -10,12 +10,16 @@ using Telegram.Bot.Args;
 using TaskMaster;
 using Telegram.Bot.Types.ReplyMarkups;
 using TaskMaster.Domain;
+using System.Reflection;
 
 namespace telBot
 {
     class telegramTaskBot
     {
         private static Dictionary<long, Person> users = new Dictionary<long, Person>(); // потом из баззы данных
+        private static bool get_name = false;
+        private static bool is_edit = false;
+        private static bool try_perform = false;
         static void Main()
         {
             var token = "1459735372:AAGXMBsw1dxlkl30XmlG0o1Cxwu_PvY_lA4";
@@ -32,22 +36,22 @@ namespace telBot
         private static async void RecieveKeyButton(CallbackQueryEventArgs args, TelegramBotClient bot)
         {
             var id = args.CallbackQuery.From.Id;
-            switch (args.CallbackQuery.Data)
+            try
             {
-                case "cool":
-                    await bot.SendTextMessageAsync(id, "you are cool");
-                    break;
-                case "create":
-                    await bot.SendTextMessageAsync(id, "Дима Колосов, придумай название задачи");
-                    bot.OnMessage += (sender, args) =>
-                    {
-                        var taskName = CheckInputSomeInf(args, bot);
-                        ((IOwner)users[id]).AddTask(new SimpleTask(users[id], taskName, "description"));
-                    };
-                    break;
+                var task = users[id].OwnedTasks[Convert.ToInt32(args.CallbackQuery.Data)];
+                if (try_perform)
+                    task.TryPerform(users[id]);
+                if (is_edit)
+                    EditTask(args, bot, task);
+            }
+            catch
+            {
+                Console.WriteLine("smth is wrong");
+            }
+                switch (args.CallbackQuery.Data)
+            {
+
                 case "edit":
-                    ShowYourTask(args, bot);
-                    //пока только показывает
                     break;
                 case "done":
                     await bot.SendTextMessageAsync(id, "Вот когда сделаешь методы, тогда и done");
@@ -55,26 +59,30 @@ namespace telBot
 
             }
         }
-        
-        private static async void ShowYourTask(CallbackQueryEventArgs args, TelegramBotClient bot)
+
+        private static async void ShowYourTask(MessageEventArgs args, TelegramBotClient bot, long id)
         {
-            var id = args.CallbackQuery.From.Id;
+
             var listTasks = new List<InlineKeyboardButton>();
             foreach (var task in users[id].OwnedTasks)
-                listTasks.Add(InlineKeyboardButton.WithCallbackData(task.Topic, "choose"));
+                listTasks.Add(InlineKeyboardButton.WithCallbackData(task.Topic, task.Id.ToString()));
 
             var keyboard = new InlineKeyboardMarkup(listTasks.ToArray());
-            await bot.SendTextMessageAsync(id, "тыкай", replyMarkup: keyboard);
+            await bot.SendTextMessageAsync(id, "список ваших задач", replyMarkup: keyboard);
         }
 
-        private static string CheckInputSomeInf(MessageEventArgs args, TelegramBotClient bot)
+        private static async void EditTask(CallbackQueryEventArgs args, TelegramBotClient bot, ITask task )
         {
-            var id = args.Message.Chat.Id;
-            var id2 = args.Message.From.Id;
-            if (args.Message.Type is MessageType.Text)
-                return args.Message.Text;
-            return "";
+            
+            var tasksOptions = new List<InlineKeyboardButton>();
+            foreach (var options in typeof(ITask).GetMethods())
+                tasksOptions.Add(InlineKeyboardButton.WithCallbackData(options.Name));
+
+            var keyboard = new InlineKeyboardMarkup(tasksOptions.ToArray());
+            await bot.SendTextMessageAsync(args.CallbackQuery.Message.Chat.Id, "Что хотите изменить", replyMarkup: keyboard);
         }
+
+
 
 
 
@@ -85,59 +93,63 @@ namespace telBot
             var id2 = args.Message.From.Id;
             //var userchat = args.Message.From.Username;
             if (!(users.ContainsKey(id)))
-                users.Add(id, new Person(id2, id2));
+                users.Add(id, new Person((ulong)id));
             Console.WriteLine(id + "id2 " + id2);
 
-            string message = "ну напиши мне";
+            string message = "введите команду";
             if (args.Message.Type is MessageType.Sticker)
                 message = "кто-то любит стикеры";
             if (args.Message.Type is MessageType.Text)
                 switch (args.Message.Text)
-                    {
+                {
+                    case "new task":
+                        {
+                            get_name = true;
+                            await bot.SendTextMessageAsync(id, "придумай название задачи");
+                            break;
+                        }
+                    case "edit task":
+                        {
+                            ShowYourTask(args, bot, id);
+                            is_edit = true;
+                        }
+                        break;
+                    case "show task":
+                        ShowYourTask(args, bot, id);
+                        break;
                     case "/start":
-                        message = "хаюшки";
+                        var keyboard = new ReplyKeyboardMarkup()
+                        {
+                            Keyboard = new[] {
+                                                new[] // row 1
+                                                {
+                                                    new KeyboardButton("new task"),
+                                                    new KeyboardButton("edit task")
+                                                },
+                                                new[] // row 2
+                                                {
+                                                    new KeyboardButton("show task"),
+                                                    new KeyboardButton("smth")
+                                                }
+                                            },
+                            ResizeKeyboard = true
+                        };
+                        await bot.SendTextMessageAsync(id, "Выбери команду", replyMarkup: keyboard);
                         break;
-                    case "/start@TaskssMasterBot":
-                        message = "хаюшки";
-                        break;
-                    case "/new":
-                        message = "введите имя новой задачи";
-                        break;
-                    case "/new@TaskssMasterBot":
-                        message = "введите имя новой задачи";
-                        break;
-                    case "/edit@TaskssMasterBot":
-                        message = "Dima give me methods";
-                        break;
-                    case "/edit":
-                        message = "Dima give me methods";
-                        break;
-                    case "/keyboard":
-                        var keyboard = new InlineKeyboardMarkup ( new[]
-                        { 
-                            new[]
-                            {
-                            InlineKeyboardButton.WithCallbackData("создать", "create"),
-                            InlineKeyboardButton.WithCallbackData("редактировать", "edit"),
 
-                            },
-
-                            new[]
-                            {
-                            InlineKeyboardButton.WithCallbackData("сделать", "done"),
-                            InlineKeyboardButton.WithCallbackData("молодец", "cool"),
-                            }
-                        });
-                        await bot.SendTextMessageAsync(id, "тыкай", replyMarkup: keyboard);
-                        break;
-                        
                     default:
-                        await bot.SendTextMessageAsync(id, message);
+                        if (get_name)
+                        {
+                            ((IOwner)users[id]).AddTask(new SimpleTask(users[id], args.Message.Text, "description"));
+                            get_name = false;
+                        }
+                        else
+                            await bot.SendTextMessageAsync(id, message);
                         break;
-                
+
                 };
 
-            
+
 
         }
     }

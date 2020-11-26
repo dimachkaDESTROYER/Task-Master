@@ -12,6 +12,6 @@ namespace TaskMaster
         public ulong Id { get; }
         public ICollection<ITask> TakenTasks { get; } = new HashSet<ITask>();
         public ICollection<ITask> DoneTasks { get; } = new HashSet<ITask>();
-        public ICollection<ITask> OwnedTasks { get; } = new HashSet<ITask>();
+        public List<ITask> OwnedTasks { get; } = new List<ITask>();
     }
 }

@@ -8,7 +8,7 @@ namespace TaskMaster.Domain
     {
         public ulong Id { get; }
         public HashSet<Person> Persons;
-        public ICollection<ITask> OwnedTasks { get; }
+        public List<ITask> OwnedTasks { get; }
 
         public Team(ulong id)
         {

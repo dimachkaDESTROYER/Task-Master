@@ -166,9 +166,7 @@ Data Source=Database.mdb";//руками добавлена в debug. Перед
         //        Close();
         //        throw new ArgumentException("ID not found");
         //    }
-        //    var ownedTasks=reader.GetString....
-        //    var teamMates=reader.GetString....
-        //    reader.Close();
+        //    var ownedTasks = reader.GetString....var teamMates = reader.GetString....reader.Close();
         //    Close();
         //    return new Team(ownerId, ownedTasks, teamMates);
         //}

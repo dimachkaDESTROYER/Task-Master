@@ -34,13 +34,13 @@ namespace TaskMaster
             State = TaskState.Done;
             return true;
         }
-
-        void ChangeTopic(string newTopic)
+        
+        public void ChangeTopic(string newTopic)
         {
             Topic = newTopic;
         }
 
-        void ChangeDescription(string newDescription)
+        public void ChangeDescription(string newDescription)
         {
             Description = newDescription;
         }

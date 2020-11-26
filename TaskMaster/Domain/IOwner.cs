@@ -6,7 +6,7 @@ namespace TaskMaster
 {
     public interface IOwner
     {
-        ICollection<ITask> OwnedTasks {get;}
+        List<ITask> OwnedTasks {get;}
         public void AddTask(ITask task)
         {
             OwnedTasks.Add(task);

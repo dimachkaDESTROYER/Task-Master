@@ -13,14 +13,14 @@ namespace TaskMaster
         {
             db = dataBase;
         }
-        public SimpleTask BuildSimpleTask(int ID, string topic, string description,
-            TaskState state, DateTime start, DateTime finish, DateTime deadLine,
-            int performerID, int ownerID)
-        {
-            var owner = db.GetOwner(ownerID);
-            var performer = db.GetOwner(performerID);
-            return new SimpleTask(ID, owner, performer, topic, description,
-             state, start, finish, deadLine);
-        }
+        //public SimpleTask BuildSimpleTask(int ID, string topic, string description,
+        //    TaskState state, DateTime start, DateTime finish, DateTime deadLine,
+        //    int performerID, int ownerID)
+        //{
+        //    var owner = db.GetOwner(ownerID);
+        //    var performer = db.GetOwner(performerID);
+        //    return new SimpleTask(ID, owner, performer, topic, description,
+        //     state, start, finish, deadLine);
+        //}
     }
 }
