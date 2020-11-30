@@ -114,36 +114,34 @@ namespace telBot
 
         }
 
-    
+        private static async void ChangeState(CallbackQueryEventArgs args, TelegramBotClient bot, long id, string taskName)
+        {
+            var listButtons = new List<InlineKeyboardButton>();
+            listButtons.Add(InlineKeyboardButton.WithCallbackData("Удалить"));
+            listButtons.Add(InlineKeyboardButton.WithCallbackData("Выполнено"));
+            listButtons.Add(InlineKeyboardButton.WithCallbackData("Взять себе"));
+            var keyboard = new InlineKeyboardMarkup(listButtons.ToArray());
+            await bot.SendTextMessageAsync(id, "что сделать с задачей " + taskName, replyMarkup: keyboard);
+        }
 
-    private static async void ChangeState(CallbackQueryEventArgs args, TelegramBotClient bot, long id, string taskName)
-    {
-        var listButtons = new List<InlineKeyboardButton>();
-        listButtons.Add(InlineKeyboardButton.WithCallbackData("Удалить"));
-        listButtons.Add(InlineKeyboardButton.WithCallbackData("Выполнено"));
-        listButtons.Add(InlineKeyboardButton.WithCallbackData("Взять себе"));
-        var keyboard = new InlineKeyboardMarkup(listButtons.ToArray());
-        await bot.SendTextMessageAsync(id, "что сделать с задачей " + taskName, replyMarkup: keyboard);
-    }
+        private static async void ShowYourTask(MessageEventArgs args, TelegramBotClient bot, long id)
+        {
+            var listTasks = new List<InlineKeyboardButton>();
+            foreach (var task in users[id].OwnedTasks)
+                listTasks.Add(InlineKeyboardButton.WithCallbackData(task.Topic, task.Id.ToString()));
+            var keyboard = new InlineKeyboardMarkup(listTasks.ToArray());
+            await bot.SendTextMessageAsync(id, "список ваших задач", replyMarkup: keyboard);
+        }
 
+        private static async void EditTask(CallbackQueryEventArgs args, TelegramBotClient bot, ITask task)
+        {
 
-    private static async void ShowYourTask(MessageEventArgs args, TelegramBotClient bot, long id)
-    {
-        var listTasks = new List<InlineKeyboardButton>();
-        foreach (var task in users[id].OwnedTasks)
-            listTasks.Add(InlineKeyboardButton.WithCallbackData(task.Topic, task.Id.ToString()));
-        var keyboard = new InlineKeyboardMarkup(listTasks.ToArray());
-        await bot.SendTextMessageAsync(id, "список ваших задач", replyMarkup: keyboard);
-    }
+            var tasksOptions = new List<InlineKeyboardButton>();
+            foreach (var options in typeof(ITask).GetMethods())
+                tasksOptions.Add(InlineKeyboardButton.WithCallbackData(options.Name));
 
-    private static async void EditTask(CallbackQueryEventArgs args, TelegramBotClient bot, ITask task)
-    {
-
-        var tasksOptions = new List<InlineKeyboardButton>();
-        foreach (var options in typeof(ITask).GetMethods())
-            tasksOptions.Add(InlineKeyboardButton.WithCallbackData(options.Name));
-
-            await bot.SendTextMessageAsync(id, "Что сделать?", replyMarkup: keyboard);
+            var keyboard = new InlineKeyboardMarkup(tasksOptions.ToArray());
+            await bot.SendTextMessageAsync(args.CallbackQuery.Message.Chat.Id, "Что сделать?", replyMarkup: keyboard);
         }
 
         private static async void RecieveMessage(MessageEventArgs args, TelegramBotClient bot)
