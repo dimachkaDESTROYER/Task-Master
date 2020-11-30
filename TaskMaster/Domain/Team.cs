@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TaskMaster.Domain
 {
-    class Team : IOwner
+    public class Team : IOwner
     {
         public ulong Id { get; }
         public List<Person> Persons { get; }
