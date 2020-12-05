@@ -25,8 +25,8 @@ namespace TaskMaster.Domain
         }
 
         //TODO: надо на рефлексию переписать в infrastructure
-        public SimpleTask(int id, IOwner owner, IPerformer performer, string topic, string description, TaskState state,
-            DateTime? start, DateTime? finish, DateTime deadline)
+        public SimpleTask(ulong id, string topic, string description, TaskState state,
+            DateTime? start, DateTime? finish, DateTime deadline, IOwner owner, IPerformer performer)
         {
             Owner = owner;
             Performer = performer;
