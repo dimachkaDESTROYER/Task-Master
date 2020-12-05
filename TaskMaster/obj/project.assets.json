@@ -5393,19 +5393,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\spish\\.nuget\\packages\\": {}
+    "C:\\Users\\kolos\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\GIT\\Task-Master\\TaskMaster\\TaskMaster.csproj",
+      "projectUniqueName": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster.csproj",
       "projectName": "TaskMaster",
-      "projectPath": "D:\\GIT\\Task-Master\\TaskMaster\\TaskMaster.csproj",
-      "packagesPath": "C:\\Users\\spish\\.nuget\\packages\\",
-      "outputPath": "D:\\GIT\\Task-Master\\TaskMaster\\obj\\",
+      "projectPath": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster.csproj",
+      "packagesPath": "C:\\Users\\kolos\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\spish\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\kolos\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -5483,7 +5483,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.302\\RuntimeIdentifierGraph.json"
       }
     }
   }
