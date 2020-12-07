@@ -149,7 +149,8 @@ namespace telBot
             var id = args.Message.Chat.Id;
             if (!(users.ContainsKey(id)))
             {
-                users.Add(id, new Person((ulong)id));
+                var name = "Petya"; //TODO:не Петя!!
+                users.Add(id, new Person(id, name)); //тут теперь надо имя хыыы
                 usersState.Add(id, State.Nothing);
                 usersTask.Add(id, null);
             }
@@ -193,7 +194,9 @@ namespace telBot
                     default:
                         if (usersState[id] == State.CreateNewTask)
                         {
-                            ((IOwner)users[id]).AddTask(new SimpleTask(users[id], args.Message.Text, "description"));
+                            //TODO:следущая строка, определённо, говнина и там айди не то, айди точно не семь
+                            ((IOwner)users[id]).AddTask(new SimpleTask(7 ,(IOwner)users[id], (IPerformer)users[id], args.Message.Text, "description"));
+                            //описание тоже доброе
                             usersState[id] = State.Nothing;
                         }
                         else

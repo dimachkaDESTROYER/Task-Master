@@ -6,10 +6,11 @@ namespace TaskMaster.Domain
 {
     public class SimpleTask : ITask
     {
-        public SimpleTask(IOwner owner, string topic, string description = null)
+        public SimpleTask(int id, IOwner owner, IPerformer performer, string topic, string description = null)
         {
-
+            Id = id;
             Owner = owner;
+            Performer = performer;
             if (owner is Person person)
             {
                 State = TaskState.InProcess;
@@ -25,9 +26,10 @@ namespace TaskMaster.Domain
         }
 
         //TODO: надо на рефлексию переписать в infrastructure
-        public SimpleTask(ulong id, string topic, string description, TaskState state,
+        public SimpleTask(int id, string topic, string description, TaskState state,
             DateTime? start, DateTime? finish, DateTime deadline, IOwner owner, IPerformer performer)
         {
+            Id = id;
             Owner = owner;
             Performer = performer;
             Topic = topic;

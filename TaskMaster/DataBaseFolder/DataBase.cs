@@ -31,7 +31,7 @@ namespace TaskMaster.DataBaseFolder
             }
         }
 
-        public void DeleteTask(ulong taskID)
+        public void DeleteTask(int taskID)
         {
             var query = string.Format("DELETE * FROM Task WHERE id = {0}", taskID);
             using (connectionAPI.Open())

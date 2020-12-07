@@ -1,8 +1,8 @@
 {
   "runtimeOptions": {
     "additionalProbingPaths": [
-      "C:\\Users\\spish\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\spish\\.nuget\\packages"
+      "C:\\Users\\kolos\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\kolos\\.nuget\\packages"
     ]
   }
 }

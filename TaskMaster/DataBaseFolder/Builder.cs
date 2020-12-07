@@ -22,7 +22,7 @@ namespace TaskMaster.DataBaseFolder
         public Builder PrepareBuildingSimpleTask(OleDbDataReader reader)
         {
             simpleTask = new SimpleTask(
-            id: (ulong)reader.GetInt64(0),
+            id: (int)reader.GetInt64(0),
             topic: reader.GetString(1),
             description: reader.GetString(2),
             state: (TaskState)reader.GetInt32(3),
@@ -36,7 +36,7 @@ namespace TaskMaster.DataBaseFolder
 
         public Builder PrepareBuildingPerson(OleDbDataReader reader)
         {
-            person = new Person(id: (ulong)reader.GetInt64(0),
+            person = new Person(id: (int)reader.GetInt64(0),
                 takenTasks: reader.GetString(1).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToHashSet(),
                 doneTasks: reader.GetString(2).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToHashSet(),
                 ownedTasks: reader.GetString(3).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList());
@@ -45,9 +45,11 @@ namespace TaskMaster.DataBaseFolder
 
         public Builder PrepareBuildingTeam(OleDbDataReader reader)
         {
-            team = new Team(id: (ulong)reader.GetInt64(0),
+            //TODO: aхахаххах тут тоже имя
+            team = new Team(id: (long)reader.GetInt64(0),
                 persons: reader.GetString(1).Split(',').Select(pid => db.GetPerson(Convert.ToInt32(pid))).ToList(),
-                ownedTasks: reader.GetString(2).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList());
+                ownedTasks: reader.GetString(2).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList(),
+                "VITALIK");//TODO: NOT A VITALIK
             return this;
         }
 
@@ -57,7 +59,7 @@ namespace TaskMaster.DataBaseFolder
             while (reader.Read())
             {
                 tasksList.Add(new SimpleTask(
-            id: (ulong)reader.GetInt64(0),
+            id: (int)reader.GetInt64(0),
             topic: reader.GetString(1),
             description: reader.GetString(2),
             state: (TaskState)reader.GetInt32(3),

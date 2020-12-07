@@ -6,20 +6,26 @@ namespace TaskMaster.Domain
 {
     public class Team : IOwner
     {
-        public ulong Id { get; }
+        public bool IsFull { get; } = true;
+
+        public long Id { get; }
+        public string Name { get; }
         public List<Person> Persons { get; }
         public List<ITask> OwnedTasks { get; } = new List<ITask>();
 
-        public Team(ulong id)
+        public Team(long id, string name)
         {
+            IsFull = false;
             Id = id;
+            Name = name;
         }
 
-        public Team(ulong id, List<Person> persons, List<ITask> ownedTasks)
+        public Team(long id, List<Person> persons, List<ITask> ownedTasks, string name)
         {
             Id = id;
             Persons = persons;
             OwnedTasks = ownedTasks;
+            Name = name;
         }
 
         public void AddPerson(Person person) => Persons.Add(person);

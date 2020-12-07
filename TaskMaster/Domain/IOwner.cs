@@ -7,7 +7,7 @@ namespace TaskMaster
     public interface IOwner
     {
         List<ITask> OwnedTasks {get;}
-        ulong Id { get; }
+        long Id { get; }
         public void AddTask(ITask task)
         {
             OwnedTasks.Add(task);

@@ -8,14 +8,15 @@ namespace TaskMaster.Domain.Tasks
     {
         private List<ITask> SubTasks { get; set; } = new List<ITask>();
 
-        public BranchedTask(IOwner owner, string topic, string description, List<ITask> subTasks) : base(owner, topic, description)
+        public BranchedTask(int id, IOwner owner, IPerformer performer, string topic, string description, List<ITask> subTasks)
+            : base(id, owner, performer, topic, description)
         {
             SubTasks = subTasks;
         }
 
         public BranchedTask(int id, IOwner owner, IPerformer performer, string topic, string description,
             TaskState state, DateTime? start, DateTime? finish, DateTime deadline, List<ITask> subTasks)
-            : base(id, owner, performer, topic, description, state, start, finish, deadline)
+            : base(id, topic, description, state, start, finish, deadline, owner, performer)
         {
             SubTasks = subTasks;
         }
