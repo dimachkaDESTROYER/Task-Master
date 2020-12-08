@@ -11,15 +11,19 @@ namespace TaskMaster
         // наконец-то поменять на бд!!!
         public static Dictionary<long, Person> users = new Dictionary<long, Person>();
 
-
         public static void CreateSimpleTask(long id, string name)
         {
-            var taskId = int.Parse(id.ToString()
-                + users[id].OwnedTasks.Count.ToString()
-                + users[id].TakenTasks.Count.ToString()
-                + users[id].DoneTasks.Count.ToString());
-            ((IOwner)users[id]).AddTask(new SimpleTask(taskId, users[id], users[id], name));
+            /* Надо придумать нормальный TaskID, тот что ниже ломается из-за невлезания в int */
+            /* поэтому пока передам просто id*/
+
+            //var taskId = int.Parse(id.ToString()
+            //    + users[id].OwnedTasks.Count.ToString()
+            //    + users[id].TakenTasks.Count.ToString()
+            //    + users[id].DoneTasks.Count.ToString());
+
+            ((IOwner)users[id]).AddTask(new SimpleTask(Convert.ToInt32(id), users[id], users[id], name));
         }
+
         //на кнопочки заифаю
         public static List<ITask> GetOwnedTasks(long id)
         {

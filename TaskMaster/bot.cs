@@ -32,8 +32,6 @@ namespace telBot
 
     class telegramTaskBot
     {
-
-
         private static Dictionary<long, State> usersState = new Dictionary<long, State>();
         private static Dictionary<long, ITask> usersTask = new Dictionary<long, ITask>();
         private static Dictionary<long, ListTask> listTasks = new Dictionary<long, ListTask>();
@@ -55,15 +53,32 @@ namespace telBot
             var id = args.CallbackQuery.Message.Chat.Id;
             if (usersState[id] == State.ShowTask)
             {
-                var numberId = Convert.ToInt32(args.CallbackQuery.Data);
-                var message = TaskMasters.GetTask(id, listTasks[id], numberId).ToString();
+                /* Пока так [для работоспособности] надо переписать */
+                var list = args.CallbackQuery.Data;
+                var numberId = 0;
+                if (list == "owned")
+                    numberId = 0;
+                else if (list == "taken")
+                    numberId = 1;
+                else if (list == "done")
+                    numberId = 2;
+                listTasks.Add(id, (ListTask)numberId);
+                var message = TaskMasters.GetTask(id, listTasks[id], numberId).Topic;
                 await bot.SendTextMessageAsync(id, message);
                 usersState.Remove(id);
             }
 
             else if (usersState[id] == State.EditTask)
             {
-                var numberId = Convert.ToInt32(args.CallbackQuery.Data);
+                var list = args.CallbackQuery.Data;
+                var numberId = 0;
+                if (list == "owned")
+                    numberId = 0;
+                else if (list == "taken")
+                    numberId = 1;
+                else if (list == "done")
+                    numberId = 2;
+                listTasks.Add(id, (ListTask)numberId);
                 EditTask(args, bot, TaskMasters.GetTask(id, listTasks[id], numberId));
                 usersState.Remove(id);
             }
@@ -188,7 +203,8 @@ namespace telBot
         private static async void RecieveMessage(MessageEventArgs args, TelegramBotClient bot)
         {
             var id = args.Message.Chat.Id;
-            //база данных должна проверить, есть ли пользователь, если что добавить
+
+            /* users должен быть получен из DataBase, если его там нет по id — добавить */
             if (!(TaskMasters.users.ContainsKey(id)))
             {
                 var name = args.Message.Chat.FirstName;
@@ -197,33 +213,39 @@ namespace telBot
             Console.WriteLine(id);
 
             string message = "Введите команду";
+
             if (args.Message.Type is MessageType.Sticker)
                 message = "Кто-то любит стикеры";
+
             if (args.Message.Type is MessageType.Text)
                 switch (args.Message.Text)
                 {
                     case "new task":
                         {
-                            usersState.Add(id, State.CreateNewTask);
+                            if(!usersState.ContainsKey(id))
+                                usersState.Add(id, State.CreateNewTask);
                             await bot.SendTextMessageAsync(id, "придумай название задачи");
                             break;
                         }
                     case "edit task":
                         {
-                            usersState.Add(id, State.EditTask);
+                            if (!usersState.ContainsKey(id))
+                                usersState.Add(id, State.EditTask);
                             WhatTask(args, bot);
                             break;
                         }
 
-                    case "show task":
+                    case "show tasks":
                         {
-                            usersState.Add(id, State.ShowTask);
+                            if (!usersState.ContainsKey(id))
+                                usersState.Add(id, State.ShowTask);
                             WhatTask(args, bot);
                             break;
                         }
                     case "delete/done tasks":
                         {
-                            usersState.Add(id, State.ChangeStatus);
+                            if (!usersState.ContainsKey(id))
+                                usersState.Add(id, State.ChangeStatus);
                             WhatTask(args, bot);
                             break;
                         }
