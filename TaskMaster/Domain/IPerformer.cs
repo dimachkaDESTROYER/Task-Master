@@ -5,8 +5,8 @@ namespace TaskMaster
     public interface IPerformer
     {
         long Id { get; }
-        ICollection<ITask> TakenTasks { get; }
-        ICollection<ITask> DoneTasks { get; }
+        List<ITask> TakenTasks { get; }
+        List<ITask> DoneTasks { get; }
         public void Take(ITask task)
         {
             if (task.TryTake(this))

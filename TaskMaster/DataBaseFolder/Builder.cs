@@ -37,8 +37,8 @@ namespace TaskMaster.DataBaseFolder
         public Builder PrepareBuildingPerson(OleDbDataReader reader)
         {
             person = new Person(id: (int)reader.GetInt64(0),
-                takenTasks: reader.GetString(1).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToHashSet(),
-                doneTasks: reader.GetString(2).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToHashSet(),
+                takenTasks: reader.GetString(1).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList(),
+                doneTasks: reader.GetString(2).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList(),
                 ownedTasks: reader.GetString(3).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList());
             return this;
         }

@@ -15,7 +15,7 @@ namespace TaskMaster
             Name = name;
         }
 
-        public Person(long id, HashSet<ITask> takenTasks, HashSet<ITask> doneTasks, List<ITask> ownedTasks)
+        public Person(long id, List<ITask> takenTasks, List<ITask> doneTasks, List<ITask> ownedTasks)
         {
             Id = id;
             TakenTasks = takenTasks;
@@ -25,8 +25,8 @@ namespace TaskMaster
 
         public string Name { get; }
         public long Id { get; }
-        public ICollection<ITask> TakenTasks { get; } = new HashSet<ITask>();
-        public ICollection<ITask> DoneTasks { get; } = new HashSet<ITask>();
+        public List<ITask> TakenTasks { get; } = new List<ITask>();
+        public List<ITask> DoneTasks { get; } = new List<ITask>();
         public List<ITask> OwnedTasks { get; } = new List<ITask>();
     }
 }
