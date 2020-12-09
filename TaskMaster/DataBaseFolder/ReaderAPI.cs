@@ -14,7 +14,9 @@ namespace TaskMaster.DataBaseFolder
 
         public ReaderAPI Open(ConnectionAPI connectionAPI, string query)
         {
-            reader = connectionAPI.GetCommand(query).ExecuteReader();
+            reader = connectionAPI
+                .GetCommand(query)
+                .ExecuteReader();
             return this;
         }
         protected virtual void Dispose(bool disposing)

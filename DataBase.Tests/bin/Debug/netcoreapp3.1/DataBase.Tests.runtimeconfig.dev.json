@@ -1,8 +1,0 @@
-{
-  "runtimeOptions": {
-    "additionalProbingPaths": [
-      "C:\\Users\\spish\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\spish\\.nuget\\packages"
-    ]
-  }
-}

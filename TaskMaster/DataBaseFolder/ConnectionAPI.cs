@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.OleDb;
+using System.IO;
 
 namespace TaskMaster.DataBaseFolder
 {
@@ -9,17 +10,24 @@ namespace TaskMaster.DataBaseFolder
         {
             public OleDbConnection connection;//лучше не public
             private bool disposedValue;
+            private int connectionUsersCount;
 
             public ConnectionAPI Open()
             {
-                connection.Open();//а если оно уже открыто?
+                if (connectionUsersCount == 0)
+                    connection.Open();
+                connectionUsersCount++;
                 return this;
             }
 
             public ConnectionAPI()
             {
+                var currentDir = Directory.GetCurrentDirectory();
+                var path = Directory.GetParent(currentDir).Parent.Parent.Parent.FullName
+                    + @"\TaskMaster\DataBaseFolder\MyDataBase.mdb";
+                //throw new ArgumentException(path);
                 connection = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;
-Data Source=Database.mdb");
+Data Source=" + path);
             }
 
             protected virtual void Dispose(bool disposing)
@@ -28,7 +36,9 @@ Data Source=Database.mdb");
                 {
                     if (disposing)
                     {
-                        connection.Close();
+                        if (connectionUsersCount == 1)
+                            connection.Close();
+                        connectionUsersCount--;
                     }
 
                     // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения

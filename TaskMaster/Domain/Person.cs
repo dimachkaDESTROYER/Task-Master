@@ -21,6 +21,17 @@ namespace TaskMaster
             TakenTasks = takenTasks;
             DoneTasks = doneTasks;
             OwnedTasks = ownedTasks;
+            IsFull = true;
+        }
+
+        public Person(long id, List<ITask> takenTasks, List<ITask> doneTasks, List<ITask> ownedTasks, string name)
+        {
+            Id = id;
+            TakenTasks = takenTasks;
+            DoneTasks = doneTasks;
+            OwnedTasks = ownedTasks;
+            Name = name;
+            IsFull = true;
         }
 
         public string Name { get; }

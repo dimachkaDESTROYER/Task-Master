@@ -12,69 +12,82 @@ namespace TaskMaster.DataBaseFolder
     {
         private DataBase db;
 
-        private SimpleTask simpleTask;
-        private Person person;
-        private Team team;
-        private List<ITask> tasksList;
-
         public Builder(DataBase db) => this.db = db;
 
-        public Builder PrepareBuildingSimpleTask(OleDbDataReader reader)
+        public SimpleTask BuildSimpleTask(OleDbDataReader reader)
         {
-            simpleTask = new SimpleTask(
-            id: (int)reader.GetInt64(0),
+            reader.Read();
+            var performerId = Int64.Parse(reader.GetString(7));
+            var performer = db.GetPartialPerformer(performerId);
+            var ownerId = Int64.Parse(reader.GetString(8));
+            var owner = db.GetPartialOwner(ownerId);
+            return new SimpleTask(
+                 id: Convert.ToInt32(reader.GetInt32(0)),
             topic: reader.GetString(1),
             description: reader.GetString(2),
-            state: (TaskState)reader.GetInt32(3),
-            start: reader.GetDateTime(4),
+             state: (TaskState)reader.GetInt32(3),
+             start: reader.GetDateTime(4),
             finish: reader.GetDateTime(5),
-            deadline: reader.GetDateTime(6),
-            performer: db.GetPerson(reader.GetInt32(7)),
-            owner: db.GetOwner(reader.GetInt32(8)));
-            return this;
+             deadline: reader.GetDateTime(6),
+             performer: performer,
+            owner: owner);
         }
 
-        public Builder PrepareBuildingPerson(OleDbDataReader reader)
+        public Person BuildPerson(OleDbDataReader reader)
         {
-            person = new Person(id: (int)reader.GetInt64(0),
-                takenTasks: reader.GetString(1).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList(),
-                doneTasks: reader.GetString(2).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList(),
-                ownedTasks: reader.GetString(3).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList());
-            return this;
+            reader.Read();
+            var id = Int64.Parse(reader.GetString(0));
+            var taken = reader.GetString(1).Split(',')
+                .Where(s => s != "").Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList();
+            var done = reader.GetString(2).Split(',')
+                .Where(s => s != "").Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList();
+            var owned = reader.GetString(3).Split(',')
+                .Where(s => s != "").Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList();
+            var name = reader.GetString(4);
+            return new Person(id, taken, done, owned);
         }
 
-        public Builder PrepareBuildingTeam(OleDbDataReader reader)
+        public Person BuildPartialPerson(OleDbDataReader reader)
         {
-            //TODO: aхахаххах тут тоже имя
-            team = new Team(id: (long)reader.GetInt64(0),
+            reader.Read();
+            var id = Int64.Parse(reader.GetString(0));
+            var name = reader.GetString(4);
+            return new Person(id, name);
+        }
+
+        public Team BuildTeam(OleDbDataReader reader)
+        {
+            reader.Read();
+            return new Team(id: Int64.Parse(reader.GetString(0)),
                 persons: reader.GetString(1).Split(',').Select(pid => db.GetPerson(Convert.ToInt32(pid))).ToList(),
                 ownedTasks: reader.GetString(2).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList(),
-                "VITALIK");//TODO: NOT A VITALIK
-            return this;
+                name: reader.GetString(3));
         }
 
-        public Builder PrepareBuildingTasksList(OleDbDataReader reader)
+        public Team BuildPartialTeam(OleDbDataReader reader)
         {
-            tasksList = new List<ITask>();
+            reader.Read();
+            return new Team(id: Int64.Parse(reader.GetString(0)),
+                name: reader.GetString(3));
+        }
+
+        public List<ITask> BuildTasksList(OleDbDataReader reader)
+        {
+            var tasksList = new List<ITask>();
             while (reader.Read())
             {
                 tasksList.Add(new SimpleTask(
-            id: (int)reader.GetInt64(0),
+            id: reader.GetInt32(0),
             topic: reader.GetString(1),
             description: reader.GetString(2),
             state: (TaskState)reader.GetInt32(3),
             start: reader.GetDateTime(4),
             finish: reader.GetDateTime(5),
             deadline: reader.GetDateTime(6),
-            performer: db.GetPerson(reader.GetInt32(7)),
-            owner: db.GetOwner(reader.GetInt32(8))));
+            owner: db.GetOwner(Int64.Parse(reader.GetString(8))),
+            performer: db.GetPerson(Int64.Parse(reader.GetString(7)))));
             }
-            return this;
+            return tasksList;
         }
-
-        public List<ITask> BuildTasksList() => tasksList;
-        public SimpleTask BuildSimpleTask() => simpleTask;
-        public Person BuildPerson() => person;
-        public Team BuildTeam() => team;
     }
 }

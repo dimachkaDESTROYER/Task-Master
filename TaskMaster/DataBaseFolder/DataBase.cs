@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.OleDb;
+using System.Linq;
 using System.Text;
 using TaskMaster.Domain;
 
@@ -30,6 +31,18 @@ namespace TaskMaster.DataBaseFolder
                 connectionAPI.GetCommand(query).ExecuteNonQuery();
             }
         }
+        public void Clean()
+        {
+            var queryTask = "DELETE * FROM Task";
+            var queryPerson = "DELETE * FROM Person";
+            var queryTeam = "DELETE * FROM Team";
+            using (connectionAPI.Open())
+            {
+                connectionAPI.GetCommand(queryTask).ExecuteNonQuery();
+                connectionAPI.GetCommand(queryPerson).ExecuteNonQuery();
+                connectionAPI.GetCommand(queryTeam).ExecuteNonQuery();
+            }
+        }
 
         public void DeleteTask(int taskID)
         {
@@ -37,6 +50,21 @@ namespace TaskMaster.DataBaseFolder
             using (connectionAPI.Open())
             {
                 connectionAPI.GetCommand(query).ExecuteNonQuery();
+            }
+        }
+
+        private string ToStr(ICollection<ITask> tasks) => string.Join(',', tasks.ToList().Select(t => t.Id.ToString()));
+
+        public void AddPerson(Person person)
+        {
+            using (connectionAPI.Open())
+            {
+                var values = "VALUES ('{0}','{1}','{2}','{3}','{4}')";
+                var columnNames = "Person(ID, TakenTasks, DoneTasks, OwnedTasks, PersonName )";
+                var query = string.Format("INSERT INTO " + columnNames + values,
+                    person.Id, ToStr(person.TakenTasks), ToStr(person.DoneTasks), ToStr(person.OwnedTasks), person.Name);
+                var command = new OleDbCommand(query, connectionAPI.connection);
+                command.ExecuteNonQuery();
             }
         }
 
@@ -50,41 +78,30 @@ namespace TaskMaster.DataBaseFolder
         {
             using (connectionAPI.Open())
             {
-                var values = "VALUES ({0},'{1}','{2}', {3}, '{4}', '{5}', '{6}', {7}, {8})";
+                var values = "VALUES ({0},'{1}','{2}', {3}, '{4}', '{5}', '{6}', '{7}', '{8}')";
                 var columnNames = "Task(ID, Topic, Description, State, Start, Finish, DeadLine, PerformerID, OwnerID";
                 var query = string.Format("INSERT INTO " + columnNames + " ) " + values,
                     task.Id, task.Topic, task.Description, (int)task.State,
                     task.Start, task.Finish, task.DeadLine, task.Performer.Id,
                     task.Owner.Id);
                 var command = new OleDbCommand(query, connectionAPI.connection);
-                try { command.ExecuteNonQuery(); }
-                catch (OleDbException)
-                { throw new ArgumentException("ID is already used"); }
+                command.ExecuteNonQuery();
             }
         }
-        //private void AddTask(TreeTask task)
-        //{
-        //    ;
-        //}
 
-
-        //private TreeTask GetTreeTask(int taskId)
-        //{
-        //    ;
-        //}
-
-        private Builder GetByQuery(string query, Func<OleDbDataReader, Builder> buildAnObject)
+        private object GetByQuery(string query, Func<OleDbDataReader, object> buildAnObject)
         {
             using (connectionAPI.Open())
+            using (var reader = readerAPI.Open(connectionAPI, query))
             {
-                using (var reader = readerAPI.Open(connectionAPI, query))
-                {
-                    if (reader.IsEmpty)
-                        throw new ArgumentException("ID not found");
-                    return buildAnObject(reader.reader);
-                }
+                if (reader.IsEmpty)
+                    throw new ArgumentException("ID not found");
+                return buildAnObject(reader.reader);
             }
+
         }
+
+
 
         public ITask GetTask(int taskId)
         {
@@ -94,44 +111,66 @@ namespace TaskMaster.DataBaseFolder
 
         public SimpleTask GetSimpleTask(int taskId)
         {
-            var query = string.Format("SELECT * FROM Task WHERE id = {0}", taskId);
+            var query = string.Format("SELECT * FROM Task WHERE ID = {0}", taskId);
             var builder = new Builder(this);
-            return GetByQuery(query, builder.PrepareBuildingSimpleTask).BuildSimpleTask();
+            return (SimpleTask)GetByQuery(query, builder.BuildSimpleTask);
         }
 
-        public Person GetPerson(int ID)
+        public Person GetPerson(long ID)
         {
-            var query = string.Format("SELECT * FROM Person WHERE ID = {0}", ID);
+            var query = string.Format("SELECT * FROM Person WHERE ID = '{0}'", ID);
             var builder = new Builder(this);
-            return GetByQuery(query, builder.PrepareBuildingPerson).BuildPerson();
+            return (Person)GetByQuery(query, builder.BuildPerson);
         }
-        private Team GetTeam(int ID)
+        private Person GetPartialPerson(long ID)
         {
-            var query = string.Format("SELECT * FROM Team WHERE ID = {0}", ID);
+            var query = string.Format("SELECT * FROM Person WHERE ID = '{0}'", ID);
             var builder = new Builder(this);
-            return GetByQuery(query, builder.PrepareBuildingTeam).BuildTeam();
+            return (Person)GetByQuery(query, builder.BuildPartialPerson);
+        }
+        private Team GetTeam(long ID)
+        {
+            var query = string.Format("SELECT * FROM Team WHERE ID = '{0}'", ID);
+            var builder = new Builder(this);
+            return (Team)GetByQuery(query, builder.BuildTeam);
+        }
+        private Team GetPartialTeam(long ID)
+        {
+            var query = string.Format("SELECT * FROM Team WHERE ID = '{0}'", ID);
+            var builder = new Builder(this);
+            return (Team)GetByQuery(query, builder.BuildPartialTeam);
         }
 
         public List<ITask> GetAllTasksOwnedBy(IOwner owner)
         //при расширении написать запрос по нескольким таблицам
         {
-            var query = string.Format("SELECT * FROM Task WHERE OwnerID = {0}", owner.Id);
+            var query = string.Format("SELECT * FROM Task WHERE OwnerID = '{0}'", owner.Id);
             var builder = new Builder(this);
-            return GetByQuery(query, builder.PrepareBuildingTasksList).BuildTasksList();
+            return (List<ITask>)GetByQuery(query, builder.BuildTasksList);
         }
 
-        public IEnumerable<ITask> GetAllTasksPerformedBy(IPerformer performer)
+        public List<ITask> GetAllTasksPerformedBy(IPerformer performer)
         {
-            var query = string.Format("SELECT * FROM Task WHERE PerformerID = {0}", performer.Id);
+            var query = string.Format("SELECT * FROM Task WHERE PerformerID = '{0}'", performer.Id);
             var builder = new Builder(this);
-            return GetByQuery(query, builder.PrepareBuildingTasksList).BuildTasksList();
+            return (List<ITask>)GetByQuery(query, builder.BuildTasksList);
         }
 
-        public IOwner GetOwner(int ownerId)
+        public IOwner GetOwner(long ownerId)
         {
             try { return GetPerson(ownerId); }
             catch (ArgumentException) {; }
             return GetTeam(ownerId);
+        }
+        public IOwner GetPartialOwner(long ownerId)
+        {
+            try { return GetPartialPerson(ownerId); }
+            catch (ArgumentException) {; }
+            return GetPartialTeam(ownerId);
+        }
+        public IPerformer GetPartialPerformer(long perfId)
+        {
+            return GetPartialPerson(perfId);
         }
     }
 }
