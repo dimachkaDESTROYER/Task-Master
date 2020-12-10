@@ -22,6 +22,11 @@ namespace TaskMaster.DataBaseFolder
             DeleteTask(changedTask.Id);
             AddTask(changedTask);//наверное...... это не очень производительно
         }
+        public void Change(Person changed)
+        {
+            DeletePerson(changed.Id);
+            AddPerson(changed);
+        }
 
         public void CleanTasks()//эти 2 метода можно обобщить
         {
@@ -41,6 +46,15 @@ namespace TaskMaster.DataBaseFolder
                 connectionAPI.GetCommand(queryTask).ExecuteNonQuery();
                 connectionAPI.GetCommand(queryPerson).ExecuteNonQuery();
                 connectionAPI.GetCommand(queryTeam).ExecuteNonQuery();
+            }
+        }
+
+        public void DeletePerson(long personID)
+        {
+            var query = string.Format("DELETE * FROM Person WHERE id = '{0}'", personID);
+            using (connectionAPI.Open())
+            {
+                connectionAPI.GetCommand(query).ExecuteNonQuery();
             }
         }
 
