@@ -8,6 +8,7 @@ using TaskMaster.Domain.Tasks;
 
 namespace TaskMaster.DataBaseFolder
 {
+    //TODO changeTeam
     public partial class DataBase
     {
         private ConnectionAPI connectionAPI;
@@ -72,10 +73,27 @@ namespace TaskMaster.DataBaseFolder
             }
         }
 
+        public bool Contains(Person person)
+        {
+            var query = string.Format("SELECT * FROM Person WHERE ID = '{0}'", person.Id);
+            using (connectionAPI.Open())
+            using (var reader = readerAPI.Open(connectionAPI, query))
+            { return !reader.IsEmpty; }
+        }
+        public bool Contains(Team team)
+        {
+            var query = string.Format("SELECT * FROM Team WHERE ID = '{0}'", team.Id);
+            using (connectionAPI.Open())
+            using (var reader = readerAPI.Open(connectionAPI, query))
+            { return !reader.IsEmpty; }
+        }
+
         private string ToStr(ICollection<ITask> tasks) => string.Join(',', tasks.ToList().Select(t => t.Id.ToString()));
 
         public void AddPerson(Person person)
         {
+            if (Contains(person))
+                throw new ArgumentException("ID is already used");
             using (connectionAPI.Open())
             {
                 var values = "VALUES ('{0}','{1}','{2}','{3}','{4}')";
@@ -102,7 +120,10 @@ namespace TaskMaster.DataBaseFolder
                 var columnNames = "Task(ID, Topic, Description, State, Start, Finish, DeadLine, PerformerID, OwnerID";
                 var query = string.Format("INSERT INTO " + columnNames + " ) " + values,
                     task.Id, task.Topic, task.Description, (int)task.State,
-                    task.Start, task.Finish, task.DeadLine, task.Performer.Id,
+                    task.Start,
+                    task.Finish == null ? DateTime.MaxValue : task.Finish,
+                    task.DeadLine,
+                    task.Performer == null ? "" : task.Performer.Id.ToString(),
                     task.Owner.Id, ToStr(task.SubTasks));
                 var command = new OleDbCommand(query, connectionAPI.connection);
                 command.ExecuteNonQuery();
@@ -117,7 +138,8 @@ namespace TaskMaster.DataBaseFolder
                 var columnNames = "Task(ID, Topic, Description, State, Start, Finish, DeadLine, PerformerID, OwnerID";
                 var query = string.Format("INSERT INTO " + columnNames + " ) " + values,
                     task.Id, task.Topic, task.Description, (int)task.State,
-                    task.Start, task.Finish, task.DeadLine, task.Performer.Id,
+                    task.Start, task.Finish == null ? DateTime.MaxValue : task.Finish,
+                    task.DeadLine, task.Performer == null ? "" : task.Performer.Id.ToString(),
                     task.Owner.Id);
                 var command = new OleDbCommand(query, connectionAPI.connection);
                 command.ExecuteNonQuery();
@@ -133,7 +155,6 @@ namespace TaskMaster.DataBaseFolder
                     throw new ArgumentException("ID not found");
                 return buildAnObject(reader.reader);
             }
-
         }
 
 
@@ -164,13 +185,13 @@ namespace TaskMaster.DataBaseFolder
             var builder = new Builder(this);
             return (Person)GetByQuery(query, builder.BuildPerson);
         }
-        private Person GetPartialPerson(long ID)
+        public Person GetPartialPerson(long ID)
         {
             var query = string.Format("SELECT * FROM Person WHERE ID = '{0}'", ID);
             var builder = new Builder(this);
             return (Person)GetByQuery(query, builder.BuildPartialPerson);
         }
-        public Team GetTeam(long ID)
+        private Team GetTeam(long ID)
         {
             var query = string.Format("SELECT * FROM Team WHERE ID = '{0}'", ID);
             var builder = new Builder(this);
@@ -184,7 +205,7 @@ namespace TaskMaster.DataBaseFolder
         }
 
         public List<ITask> GetAllTasksOwnedBy(IOwner owner)
-        //при расширении написать запрос по нескольким таблицам
+        //TODO не только SimpleTask
         {
             var query = string.Format("SELECT * FROM Task WHERE OwnerID = '{0}'", owner.Id);
             var builder = new Builder(this);

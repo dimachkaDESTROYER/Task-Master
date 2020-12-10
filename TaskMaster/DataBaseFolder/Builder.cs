@@ -17,20 +17,26 @@ namespace TaskMaster.DataBaseFolder
         public SimpleTask BuildSimpleTask(OleDbDataReader reader)
         {
             reader.Read();
-            var performerId = Int64.Parse(reader.GetString(7));
-            var performer = db.GetPartialPerformer(performerId);
-            var ownerId = Int64.Parse(reader.GetString(8));
-            var owner = db.GetPartialOwner(ownerId);
-            return new SimpleTask(
-                 id: Convert.ToInt32(reader.GetInt32(0)),
-            topic: reader.GetString(1),
-            description: reader.GetString(2),
-             state: (TaskState)reader.GetInt32(3),
-             start: reader.GetDateTime(4),
-            finish: reader.GetDateTime(5),
-             deadline: reader.GetDateTime(6),
-             performer: performer,
-            owner: owner);
+            return FillSimpleTask(reader);
+        }
+
+        private SimpleTask FillSimpleTask(OleDbDataReader reader)
+        {
+            var id = reader.GetInt32(0);
+            var topic = reader.GetString(1);
+            var description = reader.GetString(2);
+            var state = (TaskState)reader.GetInt32(3);
+            var start = reader.GetDateTime(4);
+            var readedFin = reader.GetDateTime(5);
+            var deadline = reader.GetDateTime(6);
+            var owner = db.GetPartialOwner(Int64.Parse(reader.GetString(8)));
+            var readedPerf = reader.GetString(7);
+            Person performer = readedPerf == "" ? null : db.GetPartialPerson(Int64.Parse(readedPerf));
+
+            if (readedFin == DateTime.MaxValue)
+                return new SimpleTask(id, topic, description, state, start, null, deadline, owner, performer);
+            else
+                return new SimpleTask(id, topic, description, state, start, readedFin, deadline, owner, performer);
         }
 
         public Person BuildPerson(OleDbDataReader reader)
@@ -76,16 +82,7 @@ namespace TaskMaster.DataBaseFolder
             var tasksList = new List<ITask>();
             while (reader.Read())
             {
-                tasksList.Add(new SimpleTask(
-            id: reader.GetInt32(0),
-            topic: reader.GetString(1),
-            description: reader.GetString(2),
-            state: (TaskState)reader.GetInt32(3),
-            start: reader.GetDateTime(4),
-            finish: reader.GetDateTime(5),
-            deadline: reader.GetDateTime(6),
-            owner: db.GetOwner(Int64.Parse(reader.GetString(8))),
-            performer: db.GetPerson(Int64.Parse(reader.GetString(7)))));
+                tasksList.Add(FillSimpleTask(reader));
             }
             return tasksList;
         }
