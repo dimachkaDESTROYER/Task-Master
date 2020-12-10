@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TaskMaster.Domain;
 using TaskMaster;
 using System.Diagnostics;
+using TaskMaster.Domain.Tasks;
 
 namespace DataBase.Tests
 {
@@ -36,7 +37,7 @@ namespace DataBase.Tests
         [Test]
         public void AddPersonWithTask()
         {
-            var sw = new Stopwatch();            
+            var sw = new Stopwatch();
             var db = new TaskMaster.DataBaseFolder.DataBase();
             db.Clean();
             sw.Start();
@@ -90,6 +91,27 @@ namespace DataBase.Tests
         }
 
         [Test]
+        public void GetAllTasksPrformedByPerson()
+        {
+            db.Clean();
+            var performer = new Person(1, new List<ITask>(), new List<ITask>(), new List<ITask>());
+            var owner = new Person(2, new List<ITask>(), new List<ITask>(), new List<ITask>());
+            var t1 = new SimpleTask(1, "myTopic1", "myDesckription1", TaskState.NotTaken, new DateTime(2020, 12, 5),
+                new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), owner: owner, performer: performer);
+            var t2 = new SimpleTask(2, "myTopic2", "myDesckription2", TaskState.NotTaken, new DateTime(2020, 12, 5),
+                new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), owner: performer, performer: owner);
+            owner.OwnedTasks.Add(t1);
+            performer.OwnedTasks.Add(t2);
+            db.AddPerson(performer);
+            db.AddPerson(owner);
+            db.AddTask(t1);
+            db.AddTask(t2);
+
+            var downloadedTasks = db.GetAllTasksPerformedBy(performer);
+            Assert.AreEqual(1, downloadedTasks.Count);
+        }
+
+        [Test]
         public void GetEmptyPersonAsOwner()
         {
             var sw = new Stopwatch();
@@ -104,6 +126,7 @@ namespace DataBase.Tests
         }
 
         [Test]
+<<<<<<< HEAD
         public void SecondAdd()
         {
             db.AddPerson(new Person(121, "Petya"));
@@ -113,5 +136,59 @@ namespace DataBase.Tests
             person.OwnedTasks.Add(task);
             db.Change(person);
         }
+=======
+        public void ChangeTask()
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var person = new Person(1, new List<ITask>(), new List<ITask>(), new List<ITask>());
+            var t1 = new SimpleTask(1, "Topic", "myDesckription1", TaskState.NotTaken, new DateTime(2020, 12, 5),
+                new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), person, person);
+            person.TakenTasks.Add(t1);
+            db.AddPerson(person);
+            t1.Topic = "newTopic";
+            db.ChangeTask(t1);
+            var downloaded = db.GetTask(1);
+            sw.Stop();
+            Assert.Less(sw.ElapsedMilliseconds, 200);
+            Assert.AreEqual(t1.Topic, downloaded.Topic);
+            Assert.AreEqual(1, downloaded.Id);
+        }
+        [Test]
+        public void ChangePersonAfterAddingTask()
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var person = new Person(1, new List<ITask>(), new List<ITask>(), new List<ITask>());
+            db.AddPerson(person);
+            var t1 = new SimpleTask(1, "Topic", "myDesckription1", TaskState.NotTaken, new DateTime(2020, 12, 5),
+                new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), person, person);
+            db.AddTask(t1);//проблема: это делать обязательно, а лучше бы AddPerson сам это делал
+            person.TakenTasks.Add(t1);
+            db.Change(person);
+            var downloaded = db.GetPerson(1);
+
+            sw.Stop();
+            Assert.Less(sw.ElapsedMilliseconds, 200);
+            Assert.AreEqual(person.Id, downloaded.Id);
+            Assert.AreEqual(person.TakenTasks.Count, downloaded.TakenTasks.Count);
+            Assert.AreEqual(person.TakenTasks[0].Id, downloaded.TakenTasks[0].Id);
+        }
+
+        //[Test]
+        //public void AddAndGetBranchedEmptyTask()
+        //{
+        //    var person = new Person(1, new List<ITask>(), new List<ITask>(), new List<ITask>());
+        //    var brTask = new BranchedTask(1, "myTopic1", "myDesckription1", TaskState.NotTaken, new DateTime(2020, 12, 5),
+        //        new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), person, person, new List<ITask>());
+        //    db.AddPerson(person);
+        //    db.AddTask(brTask);
+        //    var downloaded = db.GetTask(brTask.Id);
+        //    Assert.AreEqual(brTask.Id, downloaded.Id);
+        //    Assert.AreEqual(brTask.Owner.Id, downloaded.Owner.Id);
+        //    Assert.AreEqual(0, brTask.SubTasks.Count);
+        //}
+>>>>>>> bced1462114c6a578d68fa50189240b2a3860566
     }
 }
