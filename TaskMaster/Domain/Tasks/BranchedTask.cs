@@ -6,7 +6,7 @@ namespace TaskMaster.Domain.Tasks
 {
     class BranchedTask : SimpleTask
     {
-        private List<ITask> SubTasks { get; set; } = new List<ITask>();
+        public List<ITask> SubTasks { get; set; } = new List<ITask>();
 
         public BranchedTask(int id, IOwner owner, IPerformer performer, string topic, string description, List<ITask> subTasks)
             : base(id, owner, performer, topic, description)

@@ -11,6 +11,7 @@ using TaskMaster;
 using Telegram.Bot.Types.ReplyMarkups;
 using TaskMaster.Domain;
 using System.Reflection;
+using TaskMaster.DataBaseFolder;
 
 namespace telBot
 {
@@ -23,22 +24,14 @@ namespace telBot
         ChangeStatus
     }
 
-    public enum ListTask
-    {
-        Owned,
-        Taken,
-        Done
-    }
-
     class telegramTaskBot
     {
         private static Dictionary<long, State> usersState = new Dictionary<long, State>();
         private static Dictionary<long, ITask> usersTask = new Dictionary<long, ITask>();
-        private static Dictionary<long, ListTask> listTasks = new Dictionary<long, ListTask>();
 
         static void Main()
         {
-            var token = ""; //вставь токен
+            var token = "1459735372:AAGXMBsw1dxlkl30XmlG0o1Cxwu_PvY_lA4"; //вставь токен
             var bot = new TelegramBotClient(token);
             bot.OnMessage += (sender, args) => RecieveMessage(args, bot);
             bot.OnCallbackQuery += (sender, args) => RecieveKeyButton(args, bot);
@@ -50,46 +43,25 @@ namespace telBot
         private static async void RecieveKeyButton(CallbackQueryEventArgs args, TelegramBotClient bot)
         {
             var data = args.CallbackQuery.Data;
+            var name = args.CallbackQuery.Message.Chat.FirstName;
+            var namePerson = args.CallbackQuery.Message.From.FirstName;
             var id = args.CallbackQuery.Message.Chat.Id;
-            if (usersState[id] == State.ShowTask)
+            var idPerson = args.CallbackQuery.Message.From.Id;
+            if (data == "taken")
             {
-                /* Пока так [для работоспособности] надо переписать */
-                var list = args.CallbackQuery.Data;
-                var numberId = 0;
-                if (list == "owned")
-                    numberId = 0;
-                else if (list == "taken")
-                    numberId = 1;
-                else if (list == "done")
-                    numberId = 2;
-                listTasks.Add(id, (ListTask)numberId);
-                var message = TaskMasters.GetTask(id, listTasks[id], numberId).Topic;
-                await bot.SendTextMessageAsync(id, message);
-                usersState.Remove(id);
+                var tasks = TaskMasters.GetTakenTasks(id, name);
+                ShowYourTask(bot, id, tasks);
+            }
+            else if (data == "owned")
+            {
+                var tasks = TaskMasters.GetOwnedTasks(id, name);
+                ShowYourTask(bot, id, tasks);
             }
 
-            else if (usersState[id] == State.EditTask)
+            else if (data == "done")
             {
-                var list = args.CallbackQuery.Data;
-                var numberId = 0;
-                if (list == "owned")
-                    numberId = 0;
-                else if (list == "taken")
-                    numberId = 1;
-                else if (list == "done")
-                    numberId = 2;
-                listTasks.Add(id, (ListTask)numberId);
-                EditTask(args, bot, TaskMasters.GetTask(id, listTasks[id], numberId));
-                usersState.Remove(id);
-            }
-
-            else if (usersState[id] == State.ChangeStatus)
-            {
-                //над названием подумать не id!
-                var numberTask = Convert.ToInt32(args.CallbackQuery.Data);
-                usersTask.Add(id, TaskMasters.GetTask(id, listTasks[id], numberTask));
-                ChangeState(args, bot, id, usersTask[id].Topic);
-                usersState.Remove(id);
+                var tasks = TaskMasters.GetDoneTasks(id);
+                ShowYourTask(bot, id, tasks);
             }
 
             else if (data == "Выполнено")
@@ -98,8 +70,6 @@ namespace telBot
                     await bot.SendTextMessageAsync(id, "Задача выполнена!");
                 else
                     await bot.SendTextMessageAsync(id, "Задача не может быть выполнена!");
-                usersTask.Remove(id);
-                listTasks.Remove(id);
             }
 
             else if (data == "Взять себе")
@@ -108,56 +78,33 @@ namespace telBot
                     await bot.SendTextMessageAsync(id, "Задача присвоена");
                 else
                     await bot.SendTextMessageAsync(id, "Что-то пошло не так");
-                usersTask.Remove(id);
-                listTasks.Remove(id);
             }
             else if (data == "Удалить")
             {
-                TaskMasters.DeleteTask(usersTask[id], id, listTasks[id]);
+                TaskMasters.DeleteTask(usersTask[id].Id);
                 await bot.SendTextMessageAsync(id, "Задача удалена из вашего списка!");
-                usersTask.Remove(id);
-                listTasks.Remove(id);
+            }
+            
+            else if (usersState[id] == State.ShowTask)
+            {
+                var idTask = int.Parse(args.CallbackQuery.Data);
+                var message = TaskMasters.GetTask(idTask).Topic;
+                await bot.SendTextMessageAsync(id, message);
             }
 
-            else if (data == "taken")
+            else if (usersState[id] == State.EditTask)
             {
-                listTasks.Add(id, ListTask.Owned);
-                var tasks = TaskMasters.GetTakenTasks(id);
-                ShowYourTask(bot, id, tasks);
-            }
-            else if (data == "owned")
-            {
-                listTasks.Add(id, ListTask.Owned);
-                var tasks = TaskMasters.GetOwnedTasks(id);
-                ShowYourTask(bot, id, tasks);
-            }
-            else if (data == "done")
-            {
-                listTasks.Add(id, ListTask.Done);
-                var tasks = TaskMasters.GetDoneTasks(id);
-                ShowYourTask(bot, id, tasks);
+                var idTask = int.Parse(args.CallbackQuery.Data);
+                EditTask(args, bot, TaskMasters.GetTask(idTask));
             }
 
+            else if (usersState[id] == State.ChangeStatus)
+            {
+                var idTask = int.Parse(args.CallbackQuery.Data);
+                usersTask[id] = TaskMasters.GetTask(idTask);
+                ChangeState(args, bot, id, usersTask[id].Topic);
+            }
             await bot.AnswerCallbackQueryAsync(args.CallbackQuery.Id);
-
-            //else
-            //    try
-            //    {
-            //        var task = users[id].OwnedTasks[Convert.ToInt32(args.CallbackQuery.Data)];
-            //        if (change_status)
-            //            ChangeState(args, bot);
-            //        if (is_edit)
-            //            EditTask(args, bot, task);
-            //        foreach (var options in typeof(ITask).GetMethods())
-            //            if (data == options.Name)
-            //                options.Invoke(task, str);
-            //        надо как то передать ему задачу и на что хочет поменять
-            //    }
-            //    catch
-            //    {
-            //        Console.WriteLine("smth is wrong");
-            //    }
-
         }
 
         private static async void ChangeState(CallbackQueryEventArgs args, TelegramBotClient bot, long id, string taskName)
@@ -172,19 +119,30 @@ namespace telBot
 
         private static async void ShowYourTask(TelegramBotClient bot, long id, List<ITask> tasks)
         {
-            var listTasks = new List<InlineKeyboardButton>();
+            var listTasks = new List<List<InlineKeyboardButton>>();
             foreach (var task in tasks)
-                listTasks.Add(InlineKeyboardButton.WithCallbackData(task.Topic, task.Id.ToString()));
-            var keyboard = new InlineKeyboardMarkup(listTasks.ToArray());
+            {
+                var c = new List<InlineKeyboardButton>
+                {
+                    InlineKeyboardButton.WithCallbackData(task.Topic, task.Id.ToString())
+                };
+                listTasks.Add(c);
+            }
+            var keyboard = new InlineKeyboardMarkup(listTasks);
             await bot.SendTextMessageAsync(id, "список ваших задач", replyMarkup: keyboard);
         }
 
         private static async void EditTask(CallbackQueryEventArgs args, TelegramBotClient bot, ITask task)
         {
-            var tasksOptions = new List<InlineKeyboardButton>();
-            foreach (var options in typeof(ITask).GetMethods())
-                tasksOptions.Add(InlineKeyboardButton.WithCallbackData(options.Name));
-
+            var tasksOptions = new List<List<InlineKeyboardButton>>();
+            foreach (var options in typeof(SimpleTask).GetProperties())
+            {
+                var c = new List<InlineKeyboardButton>
+                {
+                    InlineKeyboardButton.WithCallbackData(options.Name)
+                };
+                tasksOptions.Add(c);
+            }
             var keyboard = new InlineKeyboardMarkup(tasksOptions.ToArray());
             await bot.SendTextMessageAsync(args.CallbackQuery.Message.Chat.Id, "Что сделать?", replyMarkup: keyboard);
         }
@@ -193,7 +151,8 @@ namespace telBot
         {
             var butons = new List<InlineKeyboardButton>();
             butons.Add(InlineKeyboardButton.WithCallbackData("owned"));
-            butons.Add(InlineKeyboardButton.WithCallbackData("taken"));
+            if (args.Message.Chat.Id > 0)
+                butons.Add(InlineKeyboardButton.WithCallbackData("taken"));
             butons.Add(InlineKeyboardButton.WithCallbackData("done"));
             var keyboard = new InlineKeyboardMarkup(butons.ToArray());
             await bot.SendTextMessageAsync(args.Message.Chat.Id, "Выберите список", replyMarkup: keyboard);
@@ -203,15 +162,18 @@ namespace telBot
         private static async void RecieveMessage(MessageEventArgs args, TelegramBotClient bot)
         {
             var id = args.Message.Chat.Id;
+            var name = args.Message.Chat.FirstName;
 
             /* users должен быть получен из DataBase, если его там нет по id — добавить */
-            if (!(TaskMasters.users.ContainsKey(id)))
-            {
-                var name = args.Message.Chat.FirstName;
-                TaskMasters.users.Add(id, new Person(id, name));
-            }
+            try { TaskMasters.database.GetPerson(id); }
+            catch { TaskMasters.database.AddPerson(new Person(id, name)); }
+                
             Console.WriteLine(id);
-
+            if (!usersState.ContainsKey(id))
+            {
+                usersState.Add(id, State.Nothing);
+                usersTask.Add(id, null);
+            }
             string message = "Введите команду";
 
             if (args.Message.Type is MessageType.Sticker)
@@ -222,30 +184,26 @@ namespace telBot
                 {
                     case "new task":
                         {
-                            if(!usersState.ContainsKey(id))
-                                usersState.Add(id, State.CreateNewTask);
-                            await bot.SendTextMessageAsync(id, "придумай название задачи");
+                            usersState[id] = State.CreateNewTask;
+                            await bot.SendTextMessageAsync(id, "придумай название задачи, ее описание и дедлайн, вводи через запятую");
                             break;
                         }
                     case "edit task":
                         {
-                            if (!usersState.ContainsKey(id))
-                                usersState.Add(id, State.EditTask);
+                            usersState[id] = State.EditTask;
                             WhatTask(args, bot);
                             break;
                         }
 
                     case "show tasks":
                         {
-                            if (!usersState.ContainsKey(id))
-                                usersState.Add(id, State.ShowTask);
+                            usersState[id] = State.ShowTask;
                             WhatTask(args, bot);
                             break;
                         }
                     case "delete/done tasks":
                         {
-                            if (!usersState.ContainsKey(id))
-                                usersState.Add(id, State.ChangeStatus);
+                            usersState[id] = State.ChangeStatus;
                             WhatTask(args, bot);
                             break;
                         }
@@ -257,15 +215,17 @@ namespace telBot
                         break;
 
                     default:
+                        
                         if (usersState[id] == State.CreateNewTask)
                         {
-                            TaskMasters.CreateSimpleTask(id, args.Message.Text);
+                            var data = args.Message.Text.Split(',');
+                            var deadline = data[2].Split('.').Select(c=> int.Parse(c)).ToArray();
+                            TaskMasters.CreateSimpleTask(id, data[0], data[1], new DateTime(deadline[2], deadline[1], deadline[0]));
                             await bot.SendTextMessageAsync(id, "Задача добавлена");
-                            usersState.Remove(id);
                         }
                         else
                             await bot.SendTextMessageAsync(id, message);
-                        break;
+                         break;
                 };
         }
 

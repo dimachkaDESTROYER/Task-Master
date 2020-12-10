@@ -102,5 +102,16 @@ namespace DataBase.Tests
             Assert.AreEqual(1, ((Person)downloaded).Id);
             Assert.AreEqual(1, downloaded.Id);
         }
+
+        [Test]
+        public void SecondAdd()
+        {
+            db.AddPerson(new Person(121, "Petya"));
+            var person = db.GetPerson(121);
+            var task = new SimpleTask(1, "first", "smth", TaskState.NotTaken, DateTime.Now,
+                DateTime.Now, DateTime.Now, person, person);
+            person.OwnedTasks.Add(task);
+            db.Change(person);
+        }
     }
 }

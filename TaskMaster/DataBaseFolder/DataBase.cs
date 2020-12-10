@@ -4,6 +4,7 @@ using System.Data.OleDb;
 using System.Linq;
 using System.Text;
 using TaskMaster.Domain;
+using TaskMaster.Domain.Tasks;
 
 namespace TaskMaster.DataBaseFolder
 {
@@ -17,10 +18,15 @@ namespace TaskMaster.DataBaseFolder
             connectionAPI = new ConnectionAPI();
             readerAPI = new ReaderAPI();
         }
-        public void ChangeTask(SimpleTask changedTask)
+        public void ChangeTask(ITask changedTask)
         {
             DeleteTask(changedTask.Id);
             AddTask(changedTask);//наверное...... это не очень производительно
+        }
+        public void Change(Person changed)
+        {
+            DeletePerson(changed.Id);
+            AddPerson(changed);
         }
 
         public void CleanTasks()//эти 2 метода можно обобщить
@@ -34,22 +40,35 @@ namespace TaskMaster.DataBaseFolder
         public void Clean()
         {
             var queryTask = "DELETE * FROM Task";
+            var queryBranchedTask = "DELETE * FROM BranchedTask";
             var queryPerson = "DELETE * FROM Person";
             var queryTeam = "DELETE * FROM Team";
             using (connectionAPI.Open())
             {
                 connectionAPI.GetCommand(queryTask).ExecuteNonQuery();
+                connectionAPI.GetCommand(queryBranchedTask).ExecuteNonQuery();
                 connectionAPI.GetCommand(queryPerson).ExecuteNonQuery();
                 connectionAPI.GetCommand(queryTeam).ExecuteNonQuery();
+            }
+        }
+
+        public void DeletePerson(long personID)
+        {
+            var query = string.Format("DELETE * FROM Person WHERE id = '{0}'", personID);
+            using (connectionAPI.Open())
+            {
+                connectionAPI.GetCommand(query).ExecuteNonQuery();
             }
         }
 
         public void DeleteTask(int taskID)
         {
             var query = string.Format("DELETE * FROM Task WHERE id = {0}", taskID);
+            var queryBranched = string.Format("DELETE * FROM BranchedTask WHERE id = {0}", taskID);
             using (connectionAPI.Open())
             {
                 connectionAPI.GetCommand(query).ExecuteNonQuery();
+                connectionAPI.GetCommand(queryBranched).ExecuteNonQuery();
             }
         }
 
@@ -72,6 +91,22 @@ namespace TaskMaster.DataBaseFolder
         {
             if (task is SimpleTask)
                 AddSimpleTask((SimpleTask)task);
+            if (task is BranchedTask)
+                AddBranchedTask((BranchedTask)task);
+        }
+        private void AddBranchedTask(BranchedTask task)
+        {
+            using (connectionAPI.Open())
+            {
+                var values = "VALUES ({0},'{1}','{2}', {3}, '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')";
+                var columnNames = "Task(ID, Topic, Description, State, Start, Finish, DeadLine, PerformerID, OwnerID";
+                var query = string.Format("INSERT INTO " + columnNames + " ) " + values,
+                    task.Id, task.Topic, task.Description, (int)task.State,
+                    task.Start, task.Finish, task.DeadLine, task.Performer.Id,
+                    task.Owner.Id, ToStr(task.SubTasks));
+                var command = new OleDbCommand(query, connectionAPI.connection);
+                command.ExecuteNonQuery();
+            }
         }
 
         private void AddSimpleTask(SimpleTask task)
@@ -105,8 +140,15 @@ namespace TaskMaster.DataBaseFolder
 
         public ITask GetTask(int taskId)
         {
-            return GetSimpleTask(taskId);
+            try { return GetSimpleTask(taskId); }
+            catch { return GetBranchedTask(taskId); }
             //пока что так, при расширении написать запрос по нескольким таблицам
+        }
+        public SimpleTask GetBranchedTask(int taskId)
+        {
+            var query = string.Format("SELECT * FROM BranchedTask WHERE ID = {0}", taskId);
+            var builder = new Builder(this);
+            return (SimpleTask)GetByQuery(query, builder.BuildSimpleTask);
         }
 
         public SimpleTask GetSimpleTask(int taskId)
@@ -128,7 +170,7 @@ namespace TaskMaster.DataBaseFolder
             var builder = new Builder(this);
             return (Person)GetByQuery(query, builder.BuildPartialPerson);
         }
-        private Team GetTeam(long ID)
+        public Team GetTeam(long ID)
         {
             var query = string.Format("SELECT * FROM Team WHERE ID = '{0}'", ID);
             var builder = new Builder(this);
