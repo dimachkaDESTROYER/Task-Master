@@ -68,5 +68,15 @@ namespace TaskMaster.Domain
             State = TaskState.Done;
             return true;
         }
+
+        public override string ToString()
+        {
+            var result = new StringBuilder();
+            foreach (var option in GetType().GetProperties())
+            {
+                result.Append($"{option.Name} : {option.GetValue(this)} \n");
+            }
+            return result.ToString();
+        }
     }
 }

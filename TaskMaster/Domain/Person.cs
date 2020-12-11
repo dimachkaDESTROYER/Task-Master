@@ -5,9 +5,7 @@ namespace TaskMaster
 {
     public class Person : IPerformer, IOwner
     {
-
         public bool IsFull { get; } = true;
-
         public Person(long id, string name)
         {
             IsFull = false;
@@ -33,6 +31,8 @@ namespace TaskMaster
             Name = name;
             IsFull = true;
         }
+
+        public override string ToString() => Name;
 
         public string Name { get; }
         public long Id { get; }

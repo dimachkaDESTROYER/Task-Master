@@ -50,7 +50,7 @@ namespace TaskMaster.DataBaseFolder
             var owned = reader.GetString(3).Split(',')
                 .Where(s => s != "").Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList();
             var name = reader.GetString(4);
-            return new Person(id, taken, done, owned);
+            return new Person(id, taken, done, owned, name);
         }
 
         public Person BuildPartialPerson(OleDbDataReader reader)

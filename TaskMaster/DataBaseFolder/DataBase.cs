@@ -73,13 +73,14 @@ namespace TaskMaster.DataBaseFolder
             }
         }
 
-        public bool Contains(Person person)
+        public bool Contains(long personID)
         {
-            var query = string.Format("SELECT * FROM Person WHERE ID = '{0}'", person.Id);
+            var query = string.Format("SELECT * FROM Person WHERE ID = '{0}'", personID);
             using (connectionAPI.Open())
             using (var reader = readerAPI.Open(connectionAPI, query))
             { return !reader.IsEmpty; }
         }
+
         public bool Contains(Team team)
         {
             var query = string.Format("SELECT * FROM Team WHERE ID = '{0}'", team.Id);
@@ -92,7 +93,7 @@ namespace TaskMaster.DataBaseFolder
 
         public void AddPerson(Person person)
         {
-            if (Contains(person))
+            if (Contains(person.Id))
                 throw new ArgumentException("ID is already used");
             using (connectionAPI.Open())
             {
@@ -156,8 +157,6 @@ namespace TaskMaster.DataBaseFolder
                 return buildAnObject(reader.reader);
             }
         }
-
-
 
         public ITask GetTask(int taskId)
         {

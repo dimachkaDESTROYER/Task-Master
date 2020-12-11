@@ -10,59 +10,70 @@ namespace TaskMaster
 {
     public class TaskMasters
     {
-        public static DataBase database = new DataBase();
-
-        //timeDeadline
+        public static DataBase db = new DataBase();
         public static void CreateSimpleTask(long id, string name, string description, DateTime deadline)
         {
-            var person = database.GetPerson(id);
-            var h = Math.Abs(name.GetHashCode());
-            var i = Math.Abs(id)
-                + h;
-            var taskId = i;
-            var task = new SimpleTask(unchecked((int)taskId), name, description, TaskState.NotTaken, DateTime.Now,
-                null, deadline, person, null);
+            var person = db.GetPerson(id);
+            var taskId = Math.Abs(id + name.GetHashCode());
+            var task = new SimpleTask(unchecked((int)taskId), name, description,
+                                      TaskState.NotTaken, DateTime.Now, null, 
+                                      deadline, person, null);
+
+            db.AddTask(task);
             person.OwnedTasks.Add(task);
-            database.Change(person);
+            db.Change(person);
         }
 
-        public static List<ITask> GetOwnedTasks(long id, string name)
-        {
-            var person = database.GetPerson(id);
-            return person.OwnedTasks;
-        }
+        public static List<ITask> GetOwnedTasks(long id, string name) => db.GetPerson(id).OwnedTasks;
+        public static List<ITask> GetTakenTasks(long id, string name) => db.GetPerson(id).TakenTasks;
+        public static List<ITask> GetDoneTasks(long id) => db.GetPerson(id).DoneTasks;
+        public static ITask GetTask(int idTask) => db.GetTask(idTask);
 
-        public static List<ITask> GetTakenTasks(long id, string name)
+        public static void DeleteTask(long personID, ITask task)
         {
-            var person = database.GetPerson(id);
-            return person.TakenTasks;
-        }
+            var person = db.GetPerson(personID);
+            var taskToRemove = person.OwnedTasks.Where(t => t.Id == task.Id);
+            if (taskToRemove.Any())
+                person.OwnedTasks.Remove(taskToRemove.First());
 
-        public static List<ITask> GetDoneTasks(long id)
-        {
-            var person = database.GetPerson(id);
-            return person.DoneTasks;
+            taskToRemove = person.TakenTasks.Where(t => t.Id == task.Id);
+            if (taskToRemove.Any())
+                person.TakenTasks.Remove(taskToRemove.First());
+
+            taskToRemove = person.DoneTasks.Where(t => t.Id == task.Id);
+            if (taskToRemove.Any())
+                person.DoneTasks.Remove(taskToRemove.First());
+
+            db.Change(person);
+            db.DeleteTask(task.Id);
         }
 
         public static bool TryTakeTask(ITask task, long id)
         {
-
-            return task.TryTake(database.GetPerson(id));
+            var person = db.GetPerson(id);
+            if (task.TryTake(person))
+            {
+                db.ChangeTask(task);
+                person.TakenTasks.Add(task);
+                db.Change(person);
+                return true;
+            }
+            return false;
         }
+
         public static bool TryPerformTask(ITask task, long id)
         {
-            return task.TryPerform(database.GetPerson(id));
-        }
-
-        public static void DeleteTask(int idTask)
-        {
-            database.DeleteTask(idTask);
-        }
-
-
-        public static ITask GetTask(int idTask)
-        {
-            return database.GetTask(idTask);
+            var person = db.GetPerson(id);
+            if (task.TryPerform(person))
+            {
+                db.ChangeTask(task);
+                person.OwnedTasks.Remove(task);
+                person.TakenTasks.Remove(task);
+                person.DoneTasks.Add(task);
+                db.Change(person);
+                return true;
+            }
+            return false;
         }
     }
 }

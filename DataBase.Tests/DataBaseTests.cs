@@ -264,7 +264,7 @@ namespace DataBase.Tests
         {
             var person = new Person(121, "Petya");
             db.AddPerson(person);
-            Assert.True(db.Contains(person));
+            Assert.True(db.Contains(person.Id));
         }
 
         //[Test]
