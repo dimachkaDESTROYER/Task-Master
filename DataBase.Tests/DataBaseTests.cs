@@ -259,6 +259,17 @@ namespace DataBase.Tests
             db.AddPerson(person);
             Assert.Throws<ArgumentException>(() => db.AddPerson(person));
         }
+        [Test]
+        public void ThrowExceptionTryingToAddTheSameTask()
+        {
+            var person = new Person(121, "Petya");
+            var t = new SimpleTask(1, "SimpleTopic", "SimpleDesckription1", TaskState.NotTaken, new DateTime(2020, 12, 5),
+                null, new DateTime(2020, 12, 7), person, null);
+            person.OwnedTasks.Add(t);
+            db.AddTask(t);
+            db.AddPerson(person);
+            Assert.Throws<System.Data.OleDb.OleDbException>(() => db.AddTask(t));
+        }
 
         [Test]
         public void PersonExistsInDBAfterAdding()
@@ -267,33 +278,5 @@ namespace DataBase.Tests
             db.AddPerson(person);
             Assert.True(db.Contains(person.Id));
         }
-
-        //[Test]
-        //public void AddAndGetBranchedEmptyTask()
-        //{
-        //    var person = new Person(1, new List<ITask>(), new List<ITask>(), new List<ITask>());
-        //    var brTask = new BranchedTask(1, "myTopic1", "myDesckription1", TaskState.NotTaken, new DateTime(2020, 12, 5),
-        //        new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), person, person, new List<ITask>());
-        //    db.AddPerson(person);
-        //    db.AddTask(brTask);
-        //    var downloaded = db.GetTask(brTask.Id);
-        //    Assert.AreEqual(brTask.Id, downloaded.Id);
-        //    Assert.AreEqual(brTask.Owner.Id, downloaded.Owner.Id);
-        //    Assert.AreEqual(0, brTask.SubTasks.Count);
-        //}
-
-        //[Test]
-        //public void AddAndGetBranchedEmptyTask()
-        //{
-        //    var person = new Person(1, new List<ITask>(), new List<ITask>(), new List<ITask>());
-        //    var brTask = new BranchedTask(1, "myTopic1", "myDesckription1", TaskState.NotTaken, new DateTime(2020, 12, 5),
-        //        new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), person, person, new List<ITask>());
-        //    db.AddPerson(person);
-        //    db.AddTask(brTask);
-        //    var downloaded = db.GetTask(brTask.Id);
-        //    Assert.AreEqual(brTask.Id, downloaded.Id);
-        //    Assert.AreEqual(brTask.Owner.Id, downloaded.Owner.Id);
-        //    Assert.AreEqual(0, brTask.SubTasks.Count);
-        //}
     }
 }

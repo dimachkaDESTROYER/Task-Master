@@ -5,6 +5,7 @@ using TaskMaster.Domain;
 using TaskMaster.DataBaseFolder;
 using System.Data.OleDb;
 using System.Linq;
+using TaskMaster.Domain.Tasks;
 
 namespace TaskMaster.DataBaseFolder
 {
@@ -18,6 +19,32 @@ namespace TaskMaster.DataBaseFolder
         {
             reader.Read();
             return FillSimpleTask(reader);
+        }
+
+        public BranchedTask BuildBraanchedTask(OleDbDataReader reader)
+        {
+            reader.Read();
+            return FillBranchedTask(reader);
+        }
+        private BranchedTask FillBranchedTask(OleDbDataReader reader)
+        {
+            var id = reader.GetInt32(0);
+            var topic = reader.GetString(1);
+            var description = reader.GetString(2);
+            var state = (TaskState)reader.GetInt32(3);
+            var start = reader.GetDateTime(4);
+            var readedFin = reader.GetDateTime(5);
+            var deadline = reader.GetDateTime(6);
+            var owner = db.GetPartialOwner(Int64.Parse(reader.GetString(8)));
+            var readedPerf = reader.GetString(7);
+            Person performer = readedPerf == "" ? null : db.GetPartialPerson(Int64.Parse(readedPerf));
+            List<ITask> subTasks=reader.GetString(9).Split(',')
+                .Where(s => s != "").Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList();
+
+            if (readedFin.Year == DateTime.MaxValue.Year)
+                return new BranchedTask(id, topic, description, state, start, null, deadline, owner, performer, subTasks);
+            else
+                return new BranchedTask(id, topic, description, state, start, readedFin, deadline, owner, performer, subTasks);
         }
 
         private SimpleTask FillSimpleTask(OleDbDataReader reader)

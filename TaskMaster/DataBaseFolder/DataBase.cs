@@ -96,6 +96,13 @@ namespace TaskMaster.DataBaseFolder
             using (var reader = readerAPI.Open(connectionAPI, query))
             { return !reader.IsEmpty; }
         }
+        public bool ContainsBranchedTask(int id)
+        {
+            var query = string.Format("SELECT * FROM BranchedTask WHERE ID = {0}", id);
+            using (connectionAPI.Open())
+            using (var reader = readerAPI.Open(connectionAPI, query))
+            { return !reader.IsEmpty; }
+        }
 
 
         private string ToStr(ICollection<ITask> tasks) => string.Join(',', tasks.ToList().Select(t => t.Id.ToString()));
@@ -117,24 +124,29 @@ namespace TaskMaster.DataBaseFolder
 
         public void AddTask(ITask task)
         {
+            if (task is BranchedTask)
+            {
+                AddBranchedTask((BranchedTask)task);
+                return;
+            }
             if (task is SimpleTask)
                 AddSimpleTask((SimpleTask)task);
-            if (task is BranchedTask)
-                AddBranchedTask((BranchedTask)task);
+
         }
         private void AddBranchedTask(BranchedTask task)
         {
             using (connectionAPI.Open())
             {
                 var values = "VALUES ({0},'{1}','{2}', {3}, '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')";
-                var columnNames = "Task(ID, Topic, Description, State, Start, Finish, DeadLine, PerformerID, OwnerID";
+                var columnNames = "BranchedTask(ID, Topic, Description, State, Start, Finish, DeadLine, PerformerID, OwnerID, SubTasks";
                 var query = string.Format("INSERT INTO " + columnNames + " ) " + values,
                     task.Id, task.Topic, task.Description, (int)task.State,
                     task.Start,
                     task.Finish == null ? DateTime.MaxValue : task.Finish,
                     task.DeadLine,
                     task.Performer == null ? "" : task.Performer.Id.ToString(),
-                    task.Owner.Id, ToStr(task.SubTasks));
+                    task.Owner.Id,
+                    ToStr(task.SubTasks));
                 var command = new OleDbCommand(query, connectionAPI.connection);
                 command.ExecuteNonQuery();
             }
@@ -169,15 +181,17 @@ namespace TaskMaster.DataBaseFolder
 
         public ITask GetTask(int taskId)
         {
-            try { return GetSimpleTask(taskId); }
-            catch { return GetBranchedTask(taskId); }
-            //пока что так, при расширении написать запрос по нескольким таблицам
+            if (ContainsSimpleTask(taskId))
+                return GetSimpleTask(taskId);
+            if (ContainsBranchedTask(taskId))
+                return GetBranchedTask(taskId);
+            throw new ArgumentException("ID is not found");
         }
-        public SimpleTask GetBranchedTask(int taskId)
+        public BranchedTask GetBranchedTask(int taskId)
         {
             var query = string.Format("SELECT * FROM BranchedTask WHERE ID = {0}", taskId);
             var builder = new Builder(this);
-            return (SimpleTask)GetByQuery(query, builder.BuildSimpleTask);
+            return (BranchedTask)GetByQuery(query, builder.BuildBraanchedTask);
         }
 
         public SimpleTask GetSimpleTask(int taskId)
