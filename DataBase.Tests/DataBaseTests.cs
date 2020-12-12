@@ -214,6 +214,7 @@ namespace DataBase.Tests
             sw.Stop();
             Assert.Less(sw.ElapsedMilliseconds, 200);
             Assert.AreEqual(t1.Id, downloaded.Id);
+            Assert.IsNull(downloaded.Finish);
         }
 
         [Test]

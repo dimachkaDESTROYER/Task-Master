@@ -33,7 +33,7 @@ namespace TaskMaster.DataBaseFolder
             var readedPerf = reader.GetString(7);
             Person performer = readedPerf == "" ? null : db.GetPartialPerson(Int64.Parse(readedPerf));
 
-            if (readedFin == DateTime.MaxValue)
+            if (readedFin.Year == DateTime.MaxValue.Year)
                 return new SimpleTask(id, topic, description, state, start, null, deadline, owner, performer);
             else
                 return new SimpleTask(id, topic, description, state, start, readedFin, deadline, owner, performer);

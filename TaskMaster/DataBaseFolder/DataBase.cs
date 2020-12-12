@@ -89,6 +89,15 @@ namespace TaskMaster.DataBaseFolder
             { return !reader.IsEmpty; }
         }
 
+        public bool ContainsSimpleTask(int id)
+        {
+            var query = string.Format("SELECT * FROM Task WHERE ID = {0}", id);
+            using (connectionAPI.Open())
+            using (var reader = readerAPI.Open(connectionAPI, query))
+            { return !reader.IsEmpty; }
+        }
+
+
         private string ToStr(ICollection<ITask> tasks) => string.Join(',', tasks.ToList().Select(t => t.Id.ToString()));
 
         public void AddPerson(Person person)
