@@ -21,7 +21,7 @@ namespace TaskMaster
 
             db.AddTask(task);
             person.OwnedTasks.Add(task);
-            db.Change(person);
+            db.ChangePerson(person);
         }
 
         public static List<ITask> GetOwnedTasks(long id, string name) => db.GetPerson(id).OwnedTasks;
@@ -44,7 +44,7 @@ namespace TaskMaster
             if (taskToRemove.Any())
                 person.DoneTasks.Remove(taskToRemove.First());
 
-            db.Change(person);
+            db.ChangePerson(person);
             db.DeleteTask(task.Id);
         }
 
@@ -55,7 +55,7 @@ namespace TaskMaster
             {
                 db.ChangeTask(task);
                 person.TakenTasks.Add(task);
-                db.Change(person);
+                db.ChangePerson(person);
                 return true;
             }
             return false;
@@ -70,7 +70,7 @@ namespace TaskMaster
                 person.OwnedTasks.Remove(task);
                 person.TakenTasks.Remove(task);
                 person.DoneTasks.Add(task);
-                db.Change(person);
+                db.ChangePerson(person);
                 return true;
             }
             return false;

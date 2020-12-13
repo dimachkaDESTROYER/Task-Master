@@ -92,8 +92,8 @@ namespace TaskMaster.DataBaseFolder
         {
             reader.Read();
             return new Team(id: Int64.Parse(reader.GetString(0)),
-                persons: reader.GetString(1).Split(',').Select(pid => db.GetPerson(Convert.ToInt32(pid))).ToList(),
-                ownedTasks: reader.GetString(2).Split(',').Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList(),
+                persons: reader.GetString(1).Split(',').Where(pid => pid != "").Select(pid => db.GetPartialPerson(Convert.ToInt32(pid))).ToList(),
+                ownedTasks: reader.GetString(2).Split(',').Where(tid=>tid!="").Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList(),
                 name: reader.GetString(3));
         }
 

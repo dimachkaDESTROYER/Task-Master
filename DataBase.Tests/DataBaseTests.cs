@@ -44,7 +44,6 @@ namespace DataBase.Tests
             var person = new Person(1, new List<ITask>(), new List<ITask>(), new List<ITask>());
             var task = new SimpleTask(2, "the_topic", "the_description", TaskState.Done,
                  new DateTime(2020, 12, 5), new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), person, person);
-            var tasks = new List<SimpleTask>() { task };
             db.AddTask(task);
             person.OwnedTasks.Add(task);
             person.TakenTasks.Add(task);
@@ -133,7 +132,7 @@ namespace DataBase.Tests
             var task = new SimpleTask(1, "first", "smth", TaskState.NotTaken, DateTime.Now,
                 DateTime.Now, DateTime.Now, person, person);
             person.OwnedTasks.Add(task);
-            db.Change(person);
+            db.ChangePerson(person);
         }
         public void ChangeTask()
         {
@@ -164,7 +163,7 @@ namespace DataBase.Tests
                 new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), person, person);
             db.AddTask(t1);//проблема: это делать обязательно, а лучше бы AddPerson сам это делал
             person.TakenTasks.Add(t1);
-            db.Change(person);
+            db.ChangePerson(person);
             var downloaded = db.GetPerson(1);
 
             sw.Stop();
@@ -245,7 +244,7 @@ namespace DataBase.Tests
                 DateTime.Now, DateTime.Now, person, person);
             db.AddTask(task);
             person.OwnedTasks.Add(task);
-            db.Change(person);
+            db.ChangePerson(person);
             var downloaded = db.GetPerson(person.Id);
             Assert.AreEqual(1, downloaded.OwnedTasks.Count);
             Assert.AreEqual(person.OwnedTasks[0].Topic, downloaded.OwnedTasks[0].Topic);
@@ -276,7 +275,7 @@ namespace DataBase.Tests
         {
             var person = new Person(121, "Petya");
             db.AddPerson(person);
-            Assert.True(db.Contains(person.Id));
+            Assert.True(db.ContainsPerson(person.Id));
         }
     }
 }

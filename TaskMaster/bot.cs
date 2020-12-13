@@ -169,7 +169,7 @@ namespace telBot
             var id = args.Message.Chat.Id;
             var name = args.Message.Chat.FirstName;
 
-            if (!TaskMasters.db.Contains(id)) TaskMasters.db.AddPerson(new Person(id, name));
+            if (!TaskMasters.db.ContainsPerson(id)) TaskMasters.db.AddPerson(new Person(id, name));
 
             Console.WriteLine($"{id} {name}");
             if (!usersState.ContainsKey(id))

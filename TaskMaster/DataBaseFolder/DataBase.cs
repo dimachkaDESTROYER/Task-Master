@@ -8,7 +8,7 @@ using TaskMaster.Domain.Tasks;
 
 namespace TaskMaster.DataBaseFolder
 {
-    //TODO changeTeam
+
     public partial class DataBase
     {
         private ConnectionAPI connectionAPI;
@@ -24,10 +24,15 @@ namespace TaskMaster.DataBaseFolder
             DeleteTask(changedTask.Id);
             AddTask(changedTask);//наверное...... это не очень производительно
         }
-        public void Change(Person changed)
+        public void ChangePerson(Person changed)
         {
             DeletePerson(changed.Id);
             AddPerson(changed);
+        }
+        public void ChangeTeam(Team changed)
+        {
+            DeleteTeam(changed.Id);
+            AddTeam(changed);
         }
 
         public void CleanTasks()//эти 2 метода можно обобщить
@@ -62,6 +67,15 @@ namespace TaskMaster.DataBaseFolder
             }
         }
 
+        public void DeleteTeam(long teamID)
+        {
+            var query = string.Format("DELETE * FROM Team WHERE id = '{0}'", teamID);
+            using (connectionAPI.Open())
+            {
+                connectionAPI.GetCommand(query).ExecuteNonQuery();
+            }
+        }
+
         public void DeleteTask(int taskID)
         {
             var query = string.Format("DELETE * FROM Task WHERE id = {0}", taskID);
@@ -73,7 +87,7 @@ namespace TaskMaster.DataBaseFolder
             }
         }
 
-        public bool Contains(long personID)
+        public bool ContainsPerson(long personID)
         {
             var query = string.Format("SELECT * FROM Person WHERE ID = '{0}'", personID);
             using (connectionAPI.Open())
@@ -81,9 +95,9 @@ namespace TaskMaster.DataBaseFolder
             { return !reader.IsEmpty; }
         }
 
-        public bool Contains(Team team)
+        public bool ContainsTeam(long teamID)
         {
-            var query = string.Format("SELECT * FROM Team WHERE ID = '{0}'", team.Id);
+            var query = string.Format("SELECT * FROM Team WHERE ID = '{0}'", teamID);
             using (connectionAPI.Open())
             using (var reader = readerAPI.Open(connectionAPI, query))
             { return !reader.IsEmpty; }
@@ -106,10 +120,11 @@ namespace TaskMaster.DataBaseFolder
 
 
         private string ToStr(ICollection<ITask> tasks) => string.Join(',', tasks.ToList().Select(t => t.Id.ToString()));
+        private string ToStr(ICollection<Person> persons) => string.Join(',', persons.ToList().Select(p => p.Id.ToString()));
 
         public void AddPerson(Person person)
         {
-            if (Contains(person.Id))
+            if (ContainsPerson(person.Id))
                 throw new ArgumentException("ID is already used");
             using (connectionAPI.Open())
             {
@@ -117,6 +132,20 @@ namespace TaskMaster.DataBaseFolder
                 var columnNames = "Person(ID, TakenTasks, DoneTasks, OwnedTasks, PersonName )";
                 var query = string.Format("INSERT INTO " + columnNames + values,
                     person.Id, ToStr(person.TakenTasks), ToStr(person.DoneTasks), ToStr(person.OwnedTasks), person.Name);
+                var command = new OleDbCommand(query, connectionAPI.connection);
+                command.ExecuteNonQuery();
+            }
+        }
+        public void AddTeam(Team team)
+        {
+            if (ContainsTeam(team.Id))
+                throw new ArgumentException("ID is already used");
+            using (connectionAPI.Open())
+            {
+                var values = "VALUES ('{0}','{1}','{2}','{3}')";
+                var columnNames = "Team(ID, PersonsIDs, OwnedTasksIDs, TeamName )";
+                var query = string.Format("INSERT INTO " + columnNames + values,
+                    team.Id, ToStr(team.Persons), ToStr(team.OwnedTasks), team.Name);
                 var command = new OleDbCommand(query, connectionAPI.connection);
                 command.ExecuteNonQuery();
             }
@@ -213,7 +242,7 @@ namespace TaskMaster.DataBaseFolder
             var builder = new Builder(this);
             return (Person)GetByQuery(query, builder.BuildPartialPerson);
         }
-        private Team GetTeam(long ID)
+        public Team GetTeam(long ID)
         {
             var query = string.Format("SELECT * FROM Team WHERE ID = '{0}'", ID);
             var builder = new Builder(this);
