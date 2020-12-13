@@ -13,38 +13,81 @@ namespace TaskMaster
         public static DataBase db = new DataBase();
         public static void CreateSimpleTask(long id, string name, string description, DateTime deadline)
         {
-            var person = db.GetPerson(id);
-            var taskId = Math.Abs(id + name.GetHashCode());
+            IOwner owner;
+            if (id < 0)
+                owner = db.GetTeam(id);
+            else
+                owner = db.GetPerson(id);
+
+            var taskId = Math.Abs(id + name.GetHashCode()) + deadline.GetHashCode();
             var task = new SimpleTask(unchecked((int)taskId), name, description,
-                                      TaskState.NotTaken, DateTime.Now, null, 
-                                      deadline, person, null);
+                                      TaskState.NotTaken, DateTime.Now, null,
+                                      deadline, owner, null);
 
             db.AddTask(task);
-            person.OwnedTasks.Add(task);
-            db.ChangePerson(person);
+            owner.OwnedTasks.Add(task);
+
+            if (owner is Person person)
+                db.ChangePerson(person);
+            else if (owner is Team team)
+                db.ChangeTeam(team);
         }
 
-        public static List<ITask> GetOwnedTasks(long id, string name) => db.GetPerson(id).OwnedTasks;
-        public static List<ITask> GetTakenTasks(long id, string name) => db.GetPerson(id).TakenTasks;
-        public static List<ITask> GetDoneTasks(long id) => db.GetPerson(id).DoneTasks;
+        public static List<ITask> GetOwnedTasks(long id, string name)
+        {
+            if (id > 0)
+                return db.GetPerson(id).OwnedTasks;
+            else
+                return db.GetTeam(id).OwnedTasks.Where(t => t.State == TaskState.NotTaken).ToList();
+        }
+
+        public static List<ITask> GetTakenTasks(long id, string name)
+        {
+            if (id > 0)
+                return db.GetPerson(id).TakenTasks;
+            else
+                return db.GetTeam(id).OwnedTasks.Where(t => t.State == TaskState.InProcess).ToList();
+        }
+
+        public static List<ITask> GetDoneTasks(long id)
+        {
+            if (id > 0)
+                return db.GetPerson(id).DoneTasks;
+            else
+                return db.GetTeam(id).OwnedTasks.Where(t => t.State == TaskState.Done).ToList();
+        }
+
         public static ITask GetTask(int idTask) => db.GetTask(idTask);
 
-        public static void DeleteTask(long personID, ITask task)
+        public static void DeleteTask(long id, ITask task)
         {
-            var person = db.GetPerson(personID);
-            var taskToRemove = person.OwnedTasks.Where(t => t.Id == task.Id);
-            if (taskToRemove.Any())
-                person.OwnedTasks.Remove(taskToRemove.First());
+            IOwner owner;
+            if (id > 0)
+                owner = db.GetPerson(id);
+            else
+                owner = db.GetTeam(id);
 
-            taskToRemove = person.TakenTasks.Where(t => t.Id == task.Id);
+            var taskToRemove = owner.OwnedTasks.Where(t => t.Id == task.Id);
             if (taskToRemove.Any())
-                person.TakenTasks.Remove(taskToRemove.First());
+                owner.OwnedTasks.Remove(taskToRemove.First());
 
-            taskToRemove = person.DoneTasks.Where(t => t.Id == task.Id);
-            if (taskToRemove.Any())
-                person.DoneTasks.Remove(taskToRemove.First());
+            if (owner is Person person)
+            {
+                taskToRemove = person.TakenTasks.Where(t => t.Id == task.Id);
+                taskToRemove = taskToRemove.Where(t => t.Owner.Id == id);
+                if (taskToRemove.Any())
+                    person.TakenTasks.Remove(taskToRemove.First());
 
-            db.ChangePerson(person);
+                taskToRemove = person.DoneTasks.Where(t => t.Id == task.Id);
+                if (taskToRemove.Any())
+                    person.DoneTasks.Remove(taskToRemove.First());
+            }
+
+            if (owner is Person pers)
+                db.ChangePerson(pers);
+            else if (owner is Team team)
+                db.ChangeTeam(team);
+
             db.DeleteTask(task.Id);
         }
 
@@ -55,25 +98,67 @@ namespace TaskMaster
             {
                 db.ChangeTask(task);
                 person.TakenTasks.Add(task);
+
+                var taskToRemove = person.OwnedTasks.Where(t => t.Id == task.Id);
+                if (taskToRemove.Any())
+                    person.OwnedTasks.Remove(taskToRemove.First());
+
                 db.ChangePerson(person);
                 return true;
             }
             return false;
         }
 
-        public static bool TryPerformTask(ITask task, long id)
+        public static bool TryPerformTask(ITask task, long id, long personId)
         {
-            var person = db.GetPerson(id);
-            if (task.TryPerform(person))
+            var person = db.GetPerson(personId);
+            if (personId == task.Performer.Id)
             {
-                db.ChangeTask(task);
-                person.OwnedTasks.Remove(task);
-                person.TakenTasks.Remove(task);
-                person.DoneTasks.Add(task);
-                db.ChangePerson(person);
-                return true;
+                if (task.TryPerform(person))
+                {
+                    db.ChangeTask(task);
+                    if (id < 0)
+                    {
+                        var team = db.GetTeam(id);
+
+                        var taskToRemove = person.TakenTasks.Where(t => t.Id == task.Id);
+                        if (taskToRemove.Any())
+                            person.TakenTasks.Remove(taskToRemove.First());
+                        db.ChangeTeam(team);
+                    }
+                    else
+                    {
+                        var taskToRemove = person.OwnedTasks.Where(t => t.Id == task.Id);
+                        if (taskToRemove.Any())
+                            person.TakenTasks.Remove(taskToRemove.First());
+
+                        taskToRemove = person.TakenTasks.Where(t => t.Id == task.Id);
+                        if (taskToRemove.Any())
+                            person.TakenTasks.Remove(taskToRemove.First());
+
+                        person.DoneTasks.Add(task);
+                    }
+                    db.ChangePerson(person);
+                    return true;
+                }
             }
             return false;
+        }
+
+        public static void EditTask(ITask task, long id, string param, string change)
+        {
+            var property = task.GetType().GetProperty(param);
+
+            if (property.PropertyType == typeof(DateTime?))
+            {
+                var date = change.Split('.').Select(v => int.Parse(v)).ToArray();
+                property.SetValue(task, new DateTime(date[2], date[1], date[0]));
+            }
+
+            else if (property.PropertyType == typeof(string))
+                property.SetValue(task, change);
+
+            db.ChangeTask(task);
         }
     }
 }

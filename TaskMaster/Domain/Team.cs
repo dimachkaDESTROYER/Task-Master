@@ -10,7 +10,7 @@ namespace TaskMaster.Domain
 
         public long Id { get; }
         public string Name { get; }
-        public List<Person> Persons { get; }
+        public List<Person> Persons { get; } = new List<Person>();
         public List<ITask> OwnedTasks { get; } = new List<ITask>();
 
         public Team(long id, string name)
@@ -29,5 +29,7 @@ namespace TaskMaster.Domain
         }
 
         public void AddPerson(Person person) => Persons.Add(person);
+
+        public override string ToString() => Name;
     }
 }

@@ -38,7 +38,7 @@ namespace TaskMaster.DataBaseFolder
             var owner = db.GetPartialOwner(Int64.Parse(reader.GetString(8)));
             var readedPerf = reader.GetString(7);
             Person performer = readedPerf == "" ? null : db.GetPartialPerson(Int64.Parse(readedPerf));
-            List<ITask> subTasks=reader.GetString(9).Split(',')
+            List<ITask> subTasks = reader.GetString(9).Split(',')
                 .Where(s => s != "").Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList();
 
             if (readedFin.Year == DateTime.MaxValue.Year)
@@ -93,7 +93,7 @@ namespace TaskMaster.DataBaseFolder
             reader.Read();
             return new Team(id: Int64.Parse(reader.GetString(0)),
                 persons: reader.GetString(1).Split(',').Where(pid => pid != "").Select(pid => db.GetPartialPerson(Convert.ToInt32(pid))).ToList(),
-                ownedTasks: reader.GetString(2).Split(',').Where(tid=>tid!="").Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList(),
+                ownedTasks: reader.GetString(2).Split(',').Where(tid => tid != "").Select(tid => db.GetTask(Convert.ToInt32(tid))).ToList(),
                 name: reader.GetString(3));
         }
 
