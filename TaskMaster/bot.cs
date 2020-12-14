@@ -31,7 +31,7 @@ namespace telBot
         private static Dictionary<long, ITask> usersTask = new Dictionary<long, ITask>();
         private static Dictionary<long, string> userParam = new Dictionary<long, string>();
 
-        static void Main()
+        static void Main2()
         {
             var token = ""; // <--- вставь токен
             var bot = new TelegramBotClient(token);
