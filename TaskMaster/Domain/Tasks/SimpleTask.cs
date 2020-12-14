@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace TaskMaster.Domain
@@ -69,14 +70,9 @@ namespace TaskMaster.Domain
             return true;
         }
 
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-            foreach (var option in GetType().GetProperties())
-            {
-                result.Append($"{option.Name} : {option.GetValue(this)} \n");
-            }
-            return result.ToString();
-        }
+        public override string ToString() => string.Join("/n", GetType()
+                                                                            .GetProperties()
+                                                                            .Where(p => p.Name != "Id")
+                                                                            .Select(p => $"{p.Name} : {p.GetValue(this)}"));
     }
 }

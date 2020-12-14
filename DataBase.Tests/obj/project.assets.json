@@ -6907,19 +6907,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\spish\\.nuget\\packages\\": {}
+    "C:\\Users\\kolos\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\DataBase.Tests\\DataBase.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\kolos\\Desktop\\Task-Master\\DataBase.Tests\\DataBase.Tests.csproj",
       "projectName": "DataBase.Tests",
-      "projectPath": "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\DataBase.Tests\\DataBase.Tests.csproj",
-      "packagesPath": "C:\\Users\\spish\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\DataBase.Tests\\obj\\",
+      "projectPath": "C:\\Users\\kolos\\Desktop\\Task-Master\\DataBase.Tests\\DataBase.Tests.csproj",
+      "packagesPath": "C:\\Users\\kolos\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\kolos\\Desktop\\Task-Master\\DataBase.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\spish\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\kolos\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6932,8 +6932,8 @@
       "frameworks": {
         "netcoreapp3.0": {
           "projectReferences": {
-            "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\TaskMaster\\TaskMaster.csproj": {
-              "projectPath": "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\TaskMaster\\TaskMaster.csproj"
+            "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster.csproj": {
+              "projectPath": "C:\\Users\\kolos\\Desktop\\Task-Master\\TaskMaster\\TaskMaster.csproj"
             }
           }
         }
@@ -6997,7 +6997,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.302\\RuntimeIdentifierGraph.json"
       }
     }
   }

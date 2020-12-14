@@ -20,15 +20,17 @@ namespace TaskMaster.Report
             SimpleTaskProperties = GetProperties(typeof(SimpleTask));
             BranchedTaskProperties = GetProperties(typeof(BranchedTask));
         }
-        public static void Main()
-        {
-            var person = new Person(5, new List<ITask>(), new List<ITask>(), new List<ITask>(), "Valera");
-            var task = new SimpleTask(1, "myTopic", "myDesckription", TaskState.NotTaken, new DateTime(2020, 12, 5),
-                new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), person, person);
-            var reporter = new ExcelReportMaker();
-            reporter.CreateTasksReport(new List<ITask>() { task });
-        }
-        public string CreateTasksReport(List<ITask> tasks)
+        
+        //public static void Main()
+        //{
+        //    var person = new Person(5, new List<ITask>(), new List<ITask>(), new List<ITask>(), "Valera");
+        //    var task1 = new SimpleTask(1, "chech", "myDesckription", TaskState.NotTaken, new DateTime(2020, 12, 5),
+        //        new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), person, person);
+        //    var reporter = new ExcelReportMaker();
+        //    var task2 = new BranchedTask(2, person, person, "nya", "g", new List<ITask>{task1});
+        //    reporter.CreateTasksReport(new List<ITask>() { task1, task2 });
+        //}
+        public string CreateTasksReport(List<ITask> tasks)//возможно, лучше передавать Person или Team, тогда можно в имени файла указывать имя Team или Person
         {
             var currentDir = Directory.GetCurrentDirectory();
             var directoryPath = Directory.GetParent(currentDir).Parent.Parent.Parent.FullName + @"\TaskMaster\";
@@ -37,25 +39,30 @@ namespace TaskMaster.Report
             var path = directoryPath + fileName;
 
             var package = new ExcelPackage();
-            var sheet = package.Workbook.Worksheets
-                .Add("Simple Tasks");
-            FillSimpleTaskSheet(sheet, tasks.Where(t => t is SimpleTask).Select(t => (SimpleTask)t).ToList());
 
-            sheet = package.Workbook.Worksheets
+            var simpleTasksSheet = package.Workbook.Worksheets
+                .Add("Simple Tasks");
+            new Infrastructure.ExcelPartialSerializatorFiller<SimpleTask>()
+                .FillSheet(simpleTasksSheet, tasks.OfType<SimpleTask>().ToList(), SimpleTaskProperties);
+
+            var branchedTaskSheet = package.Workbook.Worksheets
                 .Add("Branched Tasks");
+            new Infrastructure.ExcelPartialSerializatorFiller<BranchedTask>()
+                .FillSheet(branchedTaskSheet, tasks.OfType<BranchedTask>().ToList(), BranchedTaskProperties);
+            
             File.WriteAllBytes(path, package.GetAsByteArray());
             return path;
         }
 
-        private void FillSimpleTaskSheet(ExcelWorksheet sheet, List<SimpleTask> tasks)
+        private void FillSimpleTaskSheet(ExcelWorksheet sheet, List<SimpleTask> tasks, List<PropertyInfo> properties)
         {
             FillHeaders(SimpleTaskProperties, sheet);
 
             for (var row = 2; row < tasks.Count + 2; row++)
             {
-                for (int column = 1; column < SimpleTaskProperties.Count + 1; column++)
+                for (var column = 1; column < properties.Count + 1; column++)
                 {
-                    var v = SimpleTaskProperties[column - 1].GetValue(tasks[row - 2]);
+                    var v = properties[column - 1].GetValue(tasks[row - 2]);
                     if (v != null)
                         sheet.Cells[row, column].Value = v.ToString();
                 }
