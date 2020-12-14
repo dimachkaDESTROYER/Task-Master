@@ -25,7 +25,7 @@ namespace telBot
         ChangeStatus
     }
 
-    class telegramTaskBot
+    class TelegramTaskBot
     {
         private static Dictionary<long, State> usersState = new Dictionary<long, State>();
         private static Dictionary<long, ITask> usersTask = new Dictionary<long, ITask>();
@@ -39,7 +39,7 @@ namespace telBot
             bot.OnCallbackQuery += (sender, args) => RecieveKeyButton(args, bot);
             bot.StartReceiving();
             Console.ReadKey();
-            bot.StartReceiving();
+
         }
 
         private static async void RecieveKeyButton(CallbackQueryEventArgs args, TelegramBotClient bot)
@@ -71,7 +71,7 @@ namespace telBot
                 if (TaskMasters.TryPerformTask(usersTask[id], id, idPerson))
                     await bot.SendTextMessageAsync(id, $"Задача '{usersTask[id].Topic}' выполнена!");
                 else
-                    await bot.SendTextMessageAsync(id, $"Вы не можете выполнить задачу, она выполняется {((Person)usersTask[id].Performer).Name}");
+                    await bot.SendTextMessageAsync(id, $"Вы не можете выполнить задачу, её выполняет {((Person)usersTask[id].Performer).Name}");
             }
             else if (data == "Взять себе")
             {
