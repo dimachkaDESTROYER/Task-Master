@@ -29,22 +29,19 @@ namespace telBot
 
     class TelegramTaskBot
     {
-        private static Dictionary<long, State> usersState = new Dictionary<long, State>();
-        private static Dictionary<long, ITask> usersTask = new Dictionary<long, ITask>();
-        private static Dictionary<long, string> userParam = new Dictionary<long, string>();
-        private static Dictionary<long, List<ITask>> tasksToReport = new Dictionary<long, List<ITask>>();
+        private  Dictionary<long, State> usersState = new Dictionary<long, State>();
+        private  Dictionary<long, ITask> usersTask = new Dictionary<long, ITask>();
+        private  Dictionary<long, string> userParam = new Dictionary<long, string>();
+        private  Dictionary<long, List<ITask>> tasksToReport = new Dictionary<long, List<ITask>>();
 
-        static void Main()
+
+        public TelegramTaskBot(TelegramBotClient bot)
         {
-            var token = "1459735372:AAGXMBsw1dxlkl30XmlG0o1Cxwu_PvY_lA4"; // <--- вставь токен
-            var bot = new TelegramBotClient(token);
             bot.OnMessage += (sender, args) => RecieveMessage(args, bot);
             bot.OnCallbackQuery += (sender, args) => RecieveKeyButton(args, bot);
-            bot.StartReceiving();
-            Console.ReadKey();
         }
 
-        private static async void RecieveKeyButton(CallbackQueryEventArgs args, TelegramBotClient bot)
+        private  async void RecieveKeyButton(CallbackQueryEventArgs args, TelegramBotClient bot)
         {
             var data = args.CallbackQuery.Data;
             var name = args.CallbackQuery.Message.Chat.FirstName;
@@ -127,7 +124,7 @@ namespace telBot
             await bot.AnswerCallbackQueryAsync(args.CallbackQuery.Id);
         }
 
-        private static async void ChangeState(CallbackQueryEventArgs args, TelegramBotClient bot, long id, string taskName)
+        private  async void ChangeState(CallbackQueryEventArgs args, TelegramBotClient bot, long id, string taskName)
         {
             var listButtons = new List<InlineKeyboardButton>
             {
@@ -139,7 +136,7 @@ namespace telBot
             await bot.SendTextMessageAsync(id, $"Что сделать с задачей '{taskName}'?", replyMarkup: keyboard);
         }
 
-        private static async void ShowYourTask(TelegramBotClient bot, long id, List<ITask> tasks, string tasksName)
+        private  async void ShowYourTask(TelegramBotClient bot, long id, List<ITask> tasks, string tasksName)
         {
             if (!tasks.Any())
             {
@@ -168,7 +165,7 @@ namespace telBot
             await bot.SendTextMessageAsync(id, $"'{tasksName}':", replyMarkup: keyboard);
         }
 
-        private static async void EditTask(CallbackQueryEventArgs args, TelegramBotClient bot, ITask task)
+        private  async void EditTask(CallbackQueryEventArgs args, TelegramBotClient bot, ITask task)
         {
             var tasksOptions = new List<List<InlineKeyboardButton>>();
             var options = task.GetType()
@@ -186,7 +183,7 @@ namespace telBot
             await bot.SendTextMessageAsync(args.CallbackQuery.Message.Chat.Id, $"Что изменить в {task.Topic}?", replyMarkup: keyboard);
         }
 
-        private static async void ChooseListTask(MessageEventArgs args, TelegramBotClient bot)
+        private  async void ChooseListTask(MessageEventArgs args, TelegramBotClient bot)
         {
             var buttons = new List<InlineKeyboardButton>();
             buttons.Add(InlineKeyboardButton.WithCallbackData("Свободные"));
@@ -197,7 +194,7 @@ namespace telBot
             await bot.SendTextMessageAsync(args.Message.Chat.Id, "Выберите список", replyMarkup: keyboard);
         }
 
-        private static async void RecieveMessage(MessageEventArgs args, TelegramBotClient bot)
+        private  async void RecieveMessage(MessageEventArgs args, TelegramBotClient bot)
         {
             var id = args.Message.Chat.Id;
             string name = default;
@@ -333,7 +330,7 @@ namespace telBot
 
         }
 
-        private static async Task MakeStartKeyboard(TelegramBotClient bot, long id)
+        private  async Task MakeStartKeyboard(TelegramBotClient bot, long id)
         {
             var keyboard = new ReplyKeyboardMarkup()
             {

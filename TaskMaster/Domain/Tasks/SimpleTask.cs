@@ -70,7 +70,7 @@ namespace TaskMaster.Domain
             return true;
         }
 
-        public override string ToString() => string.Join("/n", GetType()
+        public override string ToString() => string.Join("\n", GetType()
                                                                             .GetProperties()
                                                                             .Where(p => p.Name != "Id")
                                                                             .Select(p => $"{p.Name} : {p.GetValue(this)}"));

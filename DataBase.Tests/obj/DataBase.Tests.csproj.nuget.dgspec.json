@@ -1,23 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\kryaz\\OneDrive\\Документы\\GitHub\\Task-Master\\DataBase.Tests\\DataBase.Tests.csproj": {}
+    "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\DataBase.Tests\\DataBase.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\kryaz\\OneDrive\\Документы\\GitHub\\Task-Master\\DataBase.Tests\\DataBase.Tests.csproj": {
+    "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\DataBase.Tests\\DataBase.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kryaz\\OneDrive\\Документы\\GitHub\\Task-Master\\DataBase.Tests\\DataBase.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\DataBase.Tests\\DataBase.Tests.csproj",
         "projectName": "DataBase.Tests",
-        "projectPath": "C:\\Users\\kryaz\\OneDrive\\Документы\\GitHub\\Task-Master\\DataBase.Tests\\DataBase.Tests.csproj",
-        "packagesPath": "C:\\Users\\kryaz\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\kryaz\\OneDrive\\Документы\\GitHub\\Task-Master\\DataBase.Tests\\obj\\",
+        "projectPath": "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\DataBase.Tests\\DataBase.Tests.csproj",
+        "packagesPath": "C:\\Users\\spish\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\DataBase.Tests\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\kryaz\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\spish\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -30,8 +27,8 @@
         "frameworks": {
           "netcoreapp3.0": {
             "projectReferences": {
-              "C:\\Users\\kryaz\\OneDrive\\Документы\\GitHub\\Task-Master\\TaskMaster\\TaskMaster.csproj": {
-                "projectPath": "C:\\Users\\kryaz\\OneDrive\\Документы\\GitHub\\Task-Master\\TaskMaster\\TaskMaster.csproj"
+              "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\TaskMaster\\TaskMaster.csproj": {
+                "projectPath": "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\TaskMaster\\TaskMaster.csproj"
               }
             }
           }
@@ -64,6 +61,10 @@
             "NUnit3TestAdapter": {
               "target": "Package",
               "version": "[3.17.0, )"
+            },
+            "Ninject": {
+              "target": "Package",
+              "version": "[3.3.4, )"
             }
           },
           "imports": [
@@ -76,29 +77,40 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[3.0.1, 3.0.1]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[3.0.0, 3.0.0]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[3.0.0, 3.0.0]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\kryaz\\OneDrive\\Документы\\GitHub\\Task-Master\\TaskMaster\\TaskMaster.csproj": {
+    "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\TaskMaster\\TaskMaster.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kryaz\\OneDrive\\Документы\\GitHub\\Task-Master\\TaskMaster\\TaskMaster.csproj",
+        "projectUniqueName": "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\TaskMaster\\TaskMaster.csproj",
         "projectName": "TaskMaster",
-        "projectPath": "C:\\Users\\kryaz\\OneDrive\\Документы\\GitHub\\Task-Master\\TaskMaster\\TaskMaster.csproj",
-        "packagesPath": "C:\\Users\\kryaz\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\kryaz\\OneDrive\\Документы\\GitHub\\Task-Master\\TaskMaster\\obj\\",
+        "projectPath": "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\TaskMaster\\TaskMaster.csproj",
+        "packagesPath": "C:\\Users\\spish\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\spish\\OneDrive\\Desktop\\MyGit\\TaskMaster\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\kryaz\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\spish\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -138,6 +150,10 @@
               "target": "Package",
               "version": "[3.17.0, )"
             },
+            "Ninject": {
+              "target": "Package",
+              "version": "[3.3.4, )"
+            },
             "System.Data.OleDb": {
               "target": "Package",
               "version": "[5.0.0, )"
@@ -157,12 +173,30 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[3.0.1, 3.0.1]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[3.0.3, 3.0.3]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[3.0.0, 3.0.0]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[3.0.0, 3.0.0]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
         }
       }
     }

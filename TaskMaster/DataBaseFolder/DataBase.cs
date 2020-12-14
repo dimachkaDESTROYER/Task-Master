@@ -9,7 +9,7 @@ using TaskMaster.Domain.Tasks;
 namespace TaskMaster.DataBaseFolder
 {
 
-    public partial class DataBase
+    public partial class DataBase : IDataBase
     {
         private ConnectionAPI connectionAPI;
         private ReaderAPI readerAPI;

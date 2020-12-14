@@ -285,7 +285,6 @@ C:\Users\spish\OneDrive\Desktop\MyGit\TaskMaster\bin\Debug\netcoreapp3.0\System.
 C:\Users\spish\OneDrive\Desktop\MyGit\TaskMaster\bin\Debug\netcoreapp3.0\runtimes\win\lib\netcoreapp3.0\System.Security.Cryptography.Cng.dll
 C:\Users\spish\OneDrive\Desktop\MyGit\TaskMaster\bin\Debug\netcoreapp3.0\runtimes\win\lib\netcoreapp3.0\System.Security.Cryptography.Pkcs.dll
 C:\Users\spish\OneDrive\Desktop\MyGit\TaskMaster\bin\Debug\netcoreapp3.0\runtimes\win\lib\netcoreapp2.0\System.Text.Encoding.CodePages.dll
-C:\Users\spish\OneDrive\Desktop\MyGit\TaskMaster\obj\Debug\netcoreapp3.0\TaskMaster.csproj.CoreCompileInputs.cache
 C:\Users\kolos\Desktop\Task-Master\TaskMaster\bin\Debug\netcoreapp3.0\EPPlus.dll
 C:\Users\kolos\Desktop\Task-Master\TaskMaster\bin\Debug\netcoreapp3.0\Microsoft.Extensions.Configuration.dll
 C:\Users\kolos\Desktop\Task-Master\TaskMaster\bin\Debug\netcoreapp3.0\Microsoft.Extensions.Configuration.Abstractions.dll
@@ -322,3 +321,5 @@ C:\Users\kryaz\OneDrive\Документы\GitHub\Task-Master\TaskMaster\bin\Deb
 C:\Users\kryaz\OneDrive\Документы\GitHub\Task-Master\TaskMaster\bin\Debug\netcoreapp3.0\runtimes\win\lib\netcoreapp3.0\System.Security.Cryptography.Cng.dll
 C:\Users\kryaz\OneDrive\Документы\GitHub\Task-Master\TaskMaster\bin\Debug\netcoreapp3.0\runtimes\win\lib\netcoreapp3.0\System.Security.Cryptography.Pkcs.dll
 C:\Users\kryaz\OneDrive\Документы\GitHub\Task-Master\TaskMaster\bin\Debug\netcoreapp3.0\runtimes\win\lib\netcoreapp2.0\System.Text.Encoding.CodePages.dll
+C:\Users\spish\OneDrive\Desktop\MyGit\TaskMaster\bin\Debug\netcoreapp3.0\Ninject.dll
+C:\Users\spish\OneDrive\Desktop\MyGit\TaskMaster\obj\Debug\netcoreapp3.0\TaskMaster.csproj.CoreCompileInputs.cache
