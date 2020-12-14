@@ -12,6 +12,8 @@ using Telegram.Bot.Types.ReplyMarkups;
 using TaskMaster.Domain;
 using System.Reflection;
 using TaskMaster.DataBaseFolder;
+using TaskMaster.Report;
+using Telegram.Bot.Types.InputFiles;
 
 namespace telBot
 {
@@ -30,16 +32,16 @@ namespace telBot
         private static Dictionary<long, State> usersState = new Dictionary<long, State>();
         private static Dictionary<long, ITask> usersTask = new Dictionary<long, ITask>();
         private static Dictionary<long, string> userParam = new Dictionary<long, string>();
+        private static Dictionary<long, List<ITask>> tasksToReport = new Dictionary<long, List<ITask>>();
 
         static void Main()
         {
-            var token = ""; // <--- вставь токен
+            var token = "1459735372:AAGXMBsw1dxlkl30XmlG0o1Cxwu_PvY_lA4"; // <--- вставь токен
             var bot = new TelegramBotClient(token);
             bot.OnMessage += (sender, args) => RecieveMessage(args, bot);
             bot.OnCallbackQuery += (sender, args) => RecieveKeyButton(args, bot);
             bot.StartReceiving();
             Console.ReadKey();
-
         }
 
         private static async void RecieveKeyButton(CallbackQueryEventArgs args, TelegramBotClient bot)
@@ -82,10 +84,20 @@ namespace telBot
             }
             else if (data == "Удалить")
             {
-                if(TaskMasters.TryDeleteTask(id, usersTask[id]))
+                if (TaskMasters.TryDeleteTask(id, usersTask[id]))
                     await bot.SendTextMessageAsync(id, $"Задача {usersTask[id].Topic} удалена из вашего списка!");
                 else
                     await bot.SendTextMessageAsync(id, $"Вы не можете удалить задачу {usersTask[id].Topic}!");
+            }
+            else if (data == "\u270d\ud83c\udffb Отчёт")
+            {
+                var reportMaker = new ExcelReportMaker();
+                using (var stream = File.OpenRead(reportMaker.CreateTasksReport(tasksToReport[id])))
+                {
+                    InputOnlineFile iof = new InputOnlineFile(stream);
+                    iof.FileName = "Report.xlsx";
+                    var send = bot.SendDocumentAsync(id, iof, "Ваш отчёт");
+                }
             }
             else if (usersState[id] == State.ShowTask)
             {
@@ -136,6 +148,7 @@ namespace telBot
             }
 
             var listTasks = new List<List<InlineKeyboardButton>>();
+            tasksToReport[id] = new List<ITask>();
             foreach (var task in tasks)
             {
                 var taskButton = new List<InlineKeyboardButton>
@@ -144,6 +157,13 @@ namespace telBot
                 };
                 listTasks.Add(taskButton);
             }
+            var visualButton = new List<InlineKeyboardButton>
+            {
+                InlineKeyboardButton.WithCallbackData("\u270d\ud83c\udffb Отчёт")
+            };
+            tasksToReport[id] = tasks;
+
+            listTasks.Add(visualButton);
             var keyboard = new InlineKeyboardMarkup(listTasks);
             await bot.SendTextMessageAsync(id, $"'{tasksName}':", replyMarkup: keyboard);
         }
@@ -217,7 +237,7 @@ namespace telBot
             }
             else
                 if (!TaskMasters.db.ContainsPerson(id))
-                    TaskMasters.db.AddPerson(new Person(id, name));
+                TaskMasters.db.AddPerson(new Person(id, name));
 
 
             Console.WriteLine($"{id} {name}");
