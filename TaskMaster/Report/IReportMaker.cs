@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace TaskMaster.Report
 {
-    interface IReportMaker
+    public interface IReportMaker
     {
         string CreateTasksReport(List<ITask> tasks);
     }

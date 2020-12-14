@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace TaskMaster.Domain.Tasks
 {
     public class SubTasks : List<ITask>
     {
-
         public SubTasks(IEnumerable<ITask> tasks) : base(tasks)
         { }
 
@@ -26,7 +24,6 @@ namespace TaskMaster.Domain.Tasks
         {
             SubTasks = new SubTasks(subTasks);
         }
-
 
         public BranchedTask(int id, string topic, string description, TaskState state, DateTime? start,
              DateTime? finish, DateTime deadline, IOwner owner, IPerformer performer, List<ITask> subTasks)

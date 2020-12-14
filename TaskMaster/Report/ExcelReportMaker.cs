@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using TaskMaster.Domain;
 using TaskMaster.Domain.Tasks;
 
@@ -20,17 +19,9 @@ namespace TaskMaster.Report
             SimpleTaskProperties = GetProperties(typeof(SimpleTask));
             BranchedTaskProperties = GetProperties(typeof(BranchedTask));
         }
-        
-        //public static void Main()
-        //{
-        //    var person = new Person(5, new List<ITask>(), new List<ITask>(), new List<ITask>(), "Valera");
-        //    var task1 = new SimpleTask(1, "chech", "myDesckription", TaskState.NotTaken, new DateTime(2020, 12, 5),
-        //        new DateTime(2020, 12, 6), new DateTime(2020, 12, 7), person, person);
-        //    var reporter = new ExcelReportMaker();
-        //    var task2 = new BranchedTask(2, person, person, "nya", "g", new List<ITask>{task1});
-        //    reporter.CreateTasksReport(new List<ITask>() { task1, task2 });
-        //}
-        public string CreateTasksReport(List<ITask> tasks)//возможно, лучше передавать Person или Team, тогда можно в имени файла указывать имя Team или Person
+
+        /* Возможно, лучше передавать Person или Team, тогда можно в имени файла указывать имя Team или Person */
+        public string CreateTasksReport(List<ITask> tasks)
         {
             var currentDir = Directory.GetCurrentDirectory();
             var directoryPath = Directory.GetParent(currentDir).Parent.Parent.Parent.FullName + @"\TaskMaster\";

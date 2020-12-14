@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using TaskMaster.Domain;
-using TaskMaster.DataBaseFolder;
 using System.Data.OleDb;
 using System.Linq;
 using TaskMaster.Domain.Tasks;
@@ -12,7 +10,6 @@ namespace TaskMaster.DataBaseFolder
     public class Builder
     {
         private DataBase db;
-
         public Builder(DataBase db) => this.db = db;
 
         public SimpleTask BuildSimpleTask(OleDbDataReader reader)
@@ -26,6 +23,7 @@ namespace TaskMaster.DataBaseFolder
             reader.Read();
             return FillBranchedTask(reader);
         }
+
         private BranchedTask FillBranchedTask(OleDbDataReader reader)
         {
             var id = reader.GetInt32(0);

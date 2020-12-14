@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace TaskMaster.Domain
 {
@@ -26,7 +24,6 @@ namespace TaskMaster.Domain
             Description = description;
         }
 
-        //TODO: надо на рефлексию переписать в infrastructure
         public SimpleTask(int id, string topic, string description, TaskState state,
             DateTime? start, DateTime? finish, DateTime deadline, IOwner owner, IPerformer performer)
         {
@@ -40,7 +37,6 @@ namespace TaskMaster.Domain
             Finish = finish;
             DeadLine = deadline;
         }
-
 
         public int Id { get; }
         public string Topic { get; set; }
@@ -71,8 +67,8 @@ namespace TaskMaster.Domain
         }
 
         public override string ToString() => string.Join("\n", GetType()
-                                                                            .GetProperties()
-                                                                            .Where(p => p.Name != "Id")
-                                                                            .Select(p => $"{p.Name} : {p.GetValue(this)}"));
+                                                              .GetProperties()
+                                                              .Where(p => p.Name != "Id")
+                                                              .Select(p => $"{p.Name} : {p.GetValue(this)}"));
     }
 }

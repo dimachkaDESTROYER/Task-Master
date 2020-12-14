@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -10,12 +9,10 @@ using Telegram.Bot.Args;
 using TaskMaster;
 using Telegram.Bot.Types.ReplyMarkups;
 using TaskMaster.Domain;
-using System.Reflection;
-using TaskMaster.DataBaseFolder;
 using TaskMaster.Report;
 using Telegram.Bot.Types.InputFiles;
 
-namespace telBot
+namespace TelegramBot
 {
     public enum State
     {
@@ -27,21 +24,20 @@ namespace telBot
         ChangeStatus
     }
 
-    class TelegramTaskBot
+    public class TelegramTaskBot
     {
         private Dictionary<long, State> usersState = new Dictionary<long, State>();
         private Dictionary<long, ITask> usersTask = new Dictionary<long, ITask>();
         private Dictionary<long, string> userParam = new Dictionary<long, string>();
         private Dictionary<long, List<ITask>> tasksToReport = new Dictionary<long, List<ITask>>();
-        private TaskMasters taskMasters;
-        private IReportMaker reportMaker;
+        private readonly TaskMasters taskMasters;
+        private readonly IReportMaker reportMaker;
 
 
         public TelegramTaskBot(TelegramBotClient bot, TaskMasters taskMasters, IReportMaker reportMaker)
         {
             this.reportMaker = reportMaker;
-            this.taskMasters = taskMasters;
-            
+            this.taskMasters = taskMasters;          
         }
 
         public async void RecieveKeyButton(CallbackQueryEventArgs args, TelegramBotClient bot)
@@ -72,8 +68,10 @@ namespace telBot
                 /* Что лежит по индексу userTask[id] ? */
                 if (taskMasters.TryPerformTask(usersTask[id], id, idPerson))
                     await bot.SendTextMessageAsync(id, $"Задача '{usersTask[id].Topic}' выполнена!");
+                else if (((Person)usersTask[id].Performer) != null)
+                    await bot.SendTextMessageAsync(id, $"Вы не можете выполнить задачу, её выполняет {((Person)usersTask[id].Performer).Name}!");
                 else
-                    await bot.SendTextMessageAsync(id, $"Вы не можете выполнить задачу, её выполняет {((Person)usersTask[id].Performer).Name}");
+                    await bot.SendTextMessageAsync(id, $"Вы не можете выполнить задачу, которую не взяли!");
             }
             else if (data == "Взять себе")
             {
@@ -85,9 +83,9 @@ namespace telBot
             else if (data == "Удалить")
             {
                 if (taskMasters.TryDeleteTask(id, usersTask[id]))
-                    await bot.SendTextMessageAsync(id, $"Задача {usersTask[id].Topic} удалена из вашего списка!");
+                    await bot.SendTextMessageAsync(id, $"Задача '{usersTask[id].Topic}' удалена из вашего списка!");
                 else
-                    await bot.SendTextMessageAsync(id, $"Вы не можете удалить задачу {usersTask[id].Topic}!");
+                    await bot.SendTextMessageAsync(id, $"Вы не можете удалить задачу '{usersTask[id].Topic}'!");
             }
             else if (data == "\u270d\ud83c\udffb Отчёт")
             {
@@ -98,6 +96,7 @@ namespace telBot
                     var send = bot.SendDocumentAsync(id, iof, "Ваш отчёт");
                 }
             }
+
             else if (usersState[id] == State.ShowTask)
             {
                 var idTask = int.Parse(args.CallbackQuery.Data);
@@ -211,9 +210,7 @@ namespace telBot
                 {
                     var person = new Person(args.Message.From.Id, args.Message.From.FirstName);
                     if (!taskMasters.db.ContainsPerson(args.Message.From.Id))
-                    {
                         taskMasters.db.AddPerson(person);
-                    }
 
                     var team = new Team(id, name);
                     team.AddPerson(person);
@@ -230,14 +227,12 @@ namespace telBot
                 {
                     var person = taskMasters.db.GetPerson(args.Message.From.Id);
                     var team = taskMasters.db.GetTeam(id);
-
                     team.AddPerson(person);
                 }
             }
             else
                 if (!taskMasters.db.ContainsPerson(id))
-                taskMasters.db.AddPerson(new Person(id, name));
-
+                    taskMasters.db.AddPerson(new Person(id, name));
 
             Console.WriteLine($"{id} {name}");
             if (!usersState.ContainsKey(id))
@@ -245,8 +240,8 @@ namespace telBot
                 usersState.Add(id, State.Nothing);
                 usersTask.Add(id, null);
             }
-            string message = "Введите команду";
 
+            string message = "Введите команду";
             if (args.Message.Type is MessageType.Sticker)
             {
                 message = "Кто-то любит стикеры";

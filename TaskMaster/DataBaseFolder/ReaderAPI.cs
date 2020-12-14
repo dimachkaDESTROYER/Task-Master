@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.OleDb;
-using System.Text;
 using static TaskMaster.DataBaseFolder.DataBase;
 
 namespace TaskMaster.DataBaseFolder

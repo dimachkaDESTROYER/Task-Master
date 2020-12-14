@@ -2,33 +2,33 @@
 using System.Collections.Generic;
 using System.Data.OleDb;
 using System.Linq;
-using System.Text;
 using TaskMaster.Domain;
 using TaskMaster.Domain.Tasks;
 
 namespace TaskMaster.DataBaseFolder
 {
-
     public partial class DataBase : IDataBase
     {
         private ConnectionAPI connectionAPI;
         private ReaderAPI readerAPI;
-
         public DataBase()
         {
             connectionAPI = new ConnectionAPI();
             readerAPI = new ReaderAPI();
         }
+
         public void ChangeTask(ITask changedTask)
         {
             DeleteTask(changedTask.Id);
             AddTask(changedTask);//наверное...... это не очень производительно
         }
+
         public void ChangePerson(Person changed)
         {
             DeletePerson(changed.Id);
             AddPerson(changed);
         }
+
         public void ChangeTeam(Team changed)
         {
             DeleteTeam(changed.Id);
@@ -43,6 +43,7 @@ namespace TaskMaster.DataBaseFolder
                 connectionAPI.GetCommand(query).ExecuteNonQuery();
             }
         }
+
         public void Clean()
         {
             var queryTask = "DELETE * FROM Task";
@@ -118,7 +119,6 @@ namespace TaskMaster.DataBaseFolder
             { return !reader.IsEmpty; }
         }
 
-
         private string ToStr(ICollection<ITask> tasks) => string.Join(',', tasks.ToList().Select(t => t.Id.ToString()));
         private string ToStr(ICollection<Person> persons) => string.Join(',', persons.ToList().Select(p => p.Id.ToString()));
 
@@ -136,6 +136,7 @@ namespace TaskMaster.DataBaseFolder
                 command.ExecuteNonQuery();
             }
         }
+
         public void AddTeam(Team team)
         {
             if (ContainsTeam(team.Id))
@@ -162,6 +163,7 @@ namespace TaskMaster.DataBaseFolder
                 AddSimpleTask((SimpleTask)task);
 
         }
+
         private void AddBranchedTask(BranchedTask task)
         {
             using (connectionAPI.Open())
@@ -216,6 +218,7 @@ namespace TaskMaster.DataBaseFolder
                 return GetBranchedTask(taskId);
             throw new ArgumentException("ID is not found");
         }
+
         public BranchedTask GetBranchedTask(int taskId)
         {
             var query = string.Format("SELECT * FROM BranchedTask WHERE ID = {0}", taskId);
@@ -236,18 +239,21 @@ namespace TaskMaster.DataBaseFolder
             var builder = new Builder(this);
             return (Person)GetByQuery(query, builder.BuildPerson);
         }
+
         public Person GetPartialPerson(long ID)
         {
             var query = string.Format("SELECT * FROM Person WHERE ID = '{0}'", ID);
             var builder = new Builder(this);
             return (Person)GetByQuery(query, builder.BuildPartialPerson);
         }
+
         public Team GetTeam(long ID)
         {
             var query = string.Format("SELECT * FROM Team WHERE ID = '{0}'", ID);
             var builder = new Builder(this);
             return (Team)GetByQuery(query, builder.BuildTeam);
         }
+
         private Team GetPartialTeam(long ID)
         {
             var query = string.Format("SELECT * FROM Team WHERE ID = '{0}'", ID);
@@ -255,8 +261,7 @@ namespace TaskMaster.DataBaseFolder
             return (Team)GetByQuery(query, builder.BuildPartialTeam);
         }
 
-        public List<ITask> GetAllTasksOwnedBy(IOwner owner)
-        //TODO не только SimpleTask
+        public List<ITask> GetAllTasksOwnedBy(IOwner owner) /* не только SimpleTask*/
         {
             var query = string.Format("SELECT * FROM Task WHERE OwnerID = '{0}'", owner.Id);
             var builder = new Builder(this);
@@ -276,12 +281,14 @@ namespace TaskMaster.DataBaseFolder
             catch (ArgumentException) {; }
             return GetTeam(ownerId);
         }
+
         public IOwner GetPartialOwner(long ownerId)
         {
             try { return GetPartialPerson(ownerId); }
             catch (ArgumentException) {; }
             return GetPartialTeam(ownerId);
         }
+
         public IPerformer GetPartialPerformer(long perfId)
         {
             return GetPartialPerson(perfId);

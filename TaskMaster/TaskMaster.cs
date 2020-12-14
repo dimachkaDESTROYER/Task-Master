@@ -1,28 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using TaskMaster.DataBaseFolder;
 using TaskMaster.Domain;
-using telBot;
 
 namespace TaskMaster
 {
     public class TaskMasters
     {
-        public IDataBase db;// TODO private
+        public IDataBase db;
+        public TaskMasters(IDataBase db) => this.db = db;
 
-        public TaskMasters(IDataBase db)
-        {
-            this.db = db;
-        }
         public void CreateSimpleTask(long id, string name, string description, DateTime deadline)
         {
             IOwner owner;
-            if (id < 0)
-                owner = db.GetTeam(id);
-            else
-                owner = db.GetPerson(id);
+            if (id < 0) owner = db.GetTeam(id);
+            else owner = db.GetPerson(id);
 
             var taskId = Math.Abs(id + name.GetHashCode()) + deadline.GetHashCode();
             var task = new SimpleTask(unchecked((int)taskId), name, description,
@@ -38,10 +30,7 @@ namespace TaskMaster
                 db.ChangeTeam(team);
         }
 
-        public static void CreateBranchedTask(long id, string name, string description, DateTime deadline)
-        {
-
-        }
+        public static void CreateBranchedTask(long id, string name, string description, DateTime deadline) { }
 
         public List<ITask> GetOwnedTasks(long id, string name)
         {
@@ -147,37 +136,40 @@ namespace TaskMaster
         public bool TryPerformTask(ITask task, long id, long personId)
         {
             var person = db.GetPerson(personId);
-            if (personId == task.Performer.Id)
+            if (task.Performer != null)
             {
-                if (task.TryPerform(person))
+                if (personId == task.Performer.Id)
                 {
-                    db.ChangeTask(task);
-                    if (id < 0)
+                    if (task.TryPerform(person))
                     {
-                        var team = db.GetTeam(id);
+                        db.ChangeTask(task);
+                        if (id < 0)
+                        {
+                            var team = db.GetTeam(id);
+                            var taskToRemove = person.TakenTasks.Where(t => t.Id == task.Id);
+                            if (taskToRemove.Any())
+                                person.TakenTasks.Remove(taskToRemove.First());
+                            db.ChangeTeam(team);
+                        }
+                        else
+                        {
+                            var taskToRemove = person.OwnedTasks.Where(t => t.Id == task.Id);
+                            if (taskToRemove.Any())
+                                person.TakenTasks.Remove(taskToRemove.First());
 
-                        var taskToRemove = person.TakenTasks.Where(t => t.Id == task.Id);
-                        if (taskToRemove.Any())
-                            person.TakenTasks.Remove(taskToRemove.First());
-                        db.ChangeTeam(team);
+                            taskToRemove = person.TakenTasks.Where(t => t.Id == task.Id);
+                            if (taskToRemove.Any())
+                                person.TakenTasks.Remove(taskToRemove.First());
+
+                            person.DoneTasks.Add(task);
+                        }
+                        db.ChangePerson(person);
+                        return true;
                     }
-                    else
-                    {
-                        var taskToRemove = person.OwnedTasks.Where(t => t.Id == task.Id);
-                        if (taskToRemove.Any())
-                            person.TakenTasks.Remove(taskToRemove.First());
-
-                        taskToRemove = person.TakenTasks.Where(t => t.Id == task.Id);
-                        if (taskToRemove.Any())
-                            person.TakenTasks.Remove(taskToRemove.First());
-
-                        person.DoneTasks.Add(task);
-                    }
-                    db.ChangePerson(person);
-                    return true;
                 }
             }
             return false;
+
         }
 
         public void EditTask(ITask task, long id, string param, string change)
