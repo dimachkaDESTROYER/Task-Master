@@ -140,3 +140,5 @@ C:\Users\spish\OneDrive\Desktop\MyGit\DataBase.Tests\obj\Debug\netcoreapp3.0\Dat
 C:\Users\spish\OneDrive\Desktop\MyGit\DataBase.Tests\obj\Debug\netcoreapp3.0\DataBase.Tests.dll
 C:\Users\spish\OneDrive\Desktop\MyGit\DataBase.Tests\obj\Debug\netcoreapp3.0\DataBase.Tests.pdb
 C:\Users\spish\OneDrive\Desktop\MyGit\DataBase.Tests\obj\Debug\netcoreapp3.0\DataBase.Tests.genruntimeconfig.cache
+C:\Users\spish\OneDrive\Desktop\MyGit\DataBase.Tests\bin\Debug\netcoreapp3.0\Ninject.dll
+C:\Users\spish\OneDrive\Desktop\MyGit\DataBase.Tests\obj\Debug\netcoreapp3.0\DataBase.Tests.csproj.CoreCompileInputs.cache

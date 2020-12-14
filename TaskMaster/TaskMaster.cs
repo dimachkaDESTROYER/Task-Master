@@ -10,8 +10,13 @@ namespace TaskMaster
 {
     public class TaskMasters
     {
-        public static DataBase db = new DataBase();
-        public static void CreateSimpleTask(long id, string name, string description, DateTime deadline)
+        public IDataBase db;// TODO private
+
+        public TaskMasters(IDataBase db)
+        {
+            this.db = db;
+        }
+        public void CreateSimpleTask(long id, string name, string description, DateTime deadline)
         {
             IOwner owner;
             if (id < 0)
@@ -38,7 +43,7 @@ namespace TaskMaster
 
         }
 
-        public static List<ITask> GetOwnedTasks(long id, string name)
+        public List<ITask> GetOwnedTasks(long id, string name)
         {
             if (id > 0)
                 return db.GetPerson(id).OwnedTasks;
@@ -46,7 +51,7 @@ namespace TaskMaster
                 return db.GetTeam(id).OwnedTasks.Where(t => t.State == TaskState.NotTaken).ToList();
         }
 
-        public static List<ITask> GetTakenTasks(long id, string name)
+        public List<ITask> GetTakenTasks(long id, string name)
         {
             if (id > 0)
                 return db.GetPerson(id).TakenTasks;
@@ -54,7 +59,7 @@ namespace TaskMaster
                 return db.GetTeam(id).OwnedTasks.Where(t => t.State == TaskState.InProcess).ToList();
         }
 
-        public static List<ITask> GetDoneTasks(long id)
+        public List<ITask> GetDoneTasks(long id)
         {
             if (id > 0)
                 return db.GetPerson(id).DoneTasks;
@@ -62,9 +67,9 @@ namespace TaskMaster
                 return db.GetTeam(id).OwnedTasks.Where(t => t.State == TaskState.Done).ToList();
         }
 
-        public static ITask GetTask(int idTask) => db.GetTask(idTask);
+        public ITask GetTask(int idTask) => db.GetTask(idTask);
 
-        public static bool TryDeleteTask(long id, ITask task)
+        public bool TryDeleteTask(long id, ITask task)
         {
             IOwner owner;
             if (id > 0) owner = db.GetPerson(id);
@@ -121,7 +126,7 @@ namespace TaskMaster
             return false;
         }
 
-        public static bool TryTakeTask(ITask task, long id)
+        public bool TryTakeTask(ITask task, long id)
         {
             var person = db.GetPerson(id);
             if (task.TryTake(person))
@@ -139,7 +144,7 @@ namespace TaskMaster
             return false;
         }
 
-        public static bool TryPerformTask(ITask task, long id, long personId)
+        public bool TryPerformTask(ITask task, long id, long personId)
         {
             var person = db.GetPerson(personId);
             if (personId == task.Performer.Id)
@@ -175,7 +180,7 @@ namespace TaskMaster
             return false;
         }
 
-        public static void EditTask(ITask task, long id, string param, string change)
+        public void EditTask(ITask task, long id, string param, string change)
         {
             var property = task.GetType().GetProperty(param);
 
