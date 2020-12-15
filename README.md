@@ -28,16 +28,16 @@
 		видит свой прогресс и может приступать к следующей подзадаче. (не до конца реализовано)
 # Основные компоненты системы:
 	Связь между сервером и функциональностью бота - интерфейс
-	[TelegramTaskBot](https://github.com/dimachkaDESTROYER/Task-Master/blob/main/TaskMaster/TelegramTaskBot.cs)
-	Класс, описывающие разные виды взаимодействия пользователя с ботом - слой приложения[Task-Master](https://github.com/dimachkaDESTROYER/Task-Master/blob/main/TaskMaster/TaskMaster.cs)
-	Классы, описывающие саму задачу, пользователей, команды - Предметный слой [Domain](https://github.com/dimachkaDESTROYER/Task-Master/tree/main/TaskMaster/Domain)
+	[TelegramTaskBot] (https://github.com/dimachkaDESTROYER/Task-Master/blob/main/TaskMaster/TelegramTaskBot.cs)
+	Класс, описывающие разные виды взаимодействия пользователя с ботом - слой приложения[Task-Master] (https://github.com/dimachkaDESTROYER/Task-Master/blob/main/TaskMaster/TaskMaster.cs)
+	Классы, описывающие саму задачу, пользователей, команды - Предметный слой [Domain] (https://github.com/dimachkaDESTROYER/Task-Master/tree/main/TaskMaster/Domain)
 	Работа с базами данных - 
-	инфраструктура [DataBaseFolder](https://github.com/dimachkaDESTROYER/Task-Master/tree/main/TaskMaster/DataBaseFolder)
-	Класс для визуализации проектов [ExcelReportMaker](https://github.com/dimachkaDESTROYER/Task-Master/blob/main/TaskMaster/Report/ExcelReportMaker.cs)
+	инфраструктура [DataBaseFolder] (https://github.com/dimachkaDESTROYER/Task-Master/tree/main/TaskMaster/DataBaseFolder)
+	Класс для визуализации проектов [ExcelReportMaker] (https://github.com/dimachkaDESTROYER/Task-Master/blob/main/TaskMaster/Report/ExcelReportMaker.cs)
 # Точки расширения:
-	Добавление новых видов задач происходит через наследование от [SimpleTask](https://github.com/dimachkaDESTROYER/Task-Master/blob/6bafb6977917291c318a1d1a5ebd66bc006fd2c3/TaskMaster/Domain/Tasks/SimpleTask.cs#L6) 
-		пример такого наследования - [ветвистая задача](https://github.com/dimachkaDESTROYER/Task-Master/blob/main/TaskMaster/Domain/Tasks/BranchedTask.cs)
+	Добавление новых видов задач происходит через наследование от [SimpleTask] (https://github.com/dimachkaDESTROYER/Task-Master/blob/6bafb6977917291c318a1d1a5ebd66bc006fd2c3/TaskMaster/Domain/Tasks/SimpleTask.cs#L6) 
+		пример такого наследования - [ветвистая задача] (https://github.com/dimachkaDESTROYER/Task-Master/blob/main/TaskMaster/Domain/Tasks/BranchedTask.cs)
        В классе Task-Master в некоторых методах реализована работа через рефлексию типов, следовательно при добавлении,
 	   убавлении новых полей в описании задачи работа этих методов не нарушится, не придется заново их переписывать.
-	Добавление новых видов визуализации задач (список, mind map, таблица) происходит через реализацию интерфейса [IReportMaker](https://github.com/dimachkaDESTROYER/Task-Master/blob/main/TaskMaster/Report/IReportMaker.cs)
+	Добавление новых видов визуализации задач (список, mind map, таблица) происходит через реализацию интерфейса [IReportMaker] (https://github.com/dimachkaDESTROYER/Task-Master/blob/main/TaskMaster/Report/IReportMaker.cs)
 	
