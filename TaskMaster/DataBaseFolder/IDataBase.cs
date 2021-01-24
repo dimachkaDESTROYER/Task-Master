@@ -1,6 +1,6 @@
-﻿using TaskMaster.Domain;
+﻿using TaskMasterBot.Domain;
 
-namespace TaskMaster
+namespace TaskMasterBot
 {
     public interface IDataBase
     {

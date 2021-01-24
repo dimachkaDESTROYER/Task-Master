@@ -2,7 +2,7 @@
 using System.Data.OleDb;
 using System.IO;
 
-namespace TaskMaster.DataBaseFolder
+namespace TaskMasterBot.DataBaseFolder
 {
     public partial class DataBase
     {

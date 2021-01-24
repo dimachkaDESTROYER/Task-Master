@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TaskMaster
+namespace TaskMasterBot
 {
     public interface IOwner
     {

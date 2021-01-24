@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TaskMaster.Domain
+namespace TaskMasterBot.Domain
 {
     public class Team : IOwner
     {

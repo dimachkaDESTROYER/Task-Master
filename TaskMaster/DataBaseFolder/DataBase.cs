@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Data.OleDb;
 using System.Linq;
-using TaskMaster.Domain;
-using TaskMaster.Domain.Tasks;
+using TaskMasterBot.Domain;
+using TaskMasterBot.Domain.Tasks;
 
-namespace TaskMaster.DataBaseFolder
+namespace TaskMasterBot.DataBaseFolder
 {
     public partial class DataBase : IDataBase
     {

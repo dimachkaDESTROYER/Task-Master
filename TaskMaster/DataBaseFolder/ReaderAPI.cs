@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Data.OleDb;
-using static TaskMaster.DataBaseFolder.DataBase;
+using static TaskMasterBot.DataBaseFolder.DataBase;
 
-namespace TaskMaster.DataBaseFolder
+namespace TaskMasterBot.DataBaseFolder
 {
     public class ReaderAPI : IDisposable
     {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using TaskMaster.Domain;
+using TaskMasterBot.Domain;
 using System.Data.OleDb;
 using System.Linq;
-using TaskMaster.Domain.Tasks;
+using TaskMasterBot.Domain.Tasks;
 
-namespace TaskMaster.DataBaseFolder
+namespace TaskMasterBot.DataBaseFolder
 {
     public class Builder
     {

@@ -1,20 +1,20 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using TaskMaster.Domain;
-using TaskMaster;
+using TaskMasterBot.Domain;
+using TaskMasterBot;
 using System.Diagnostics;
-using TaskMaster.Domain.Tasks;
+using TaskMasterBot.Domain.Tasks;
 
 namespace DataBase.Tests
 {
     public class Tests
     {
-        private TaskMaster.DataBaseFolder.DataBase db;
+        private TaskMasterBot.DataBaseFolder.DataBase db;
         [SetUp]
         public void Setup()
         {
-            db = new TaskMaster.DataBaseFolder.DataBase();
+            db = new TaskMasterBot.DataBaseFolder.DataBase();
             db.Clean();//долго создаётся, порядка 6 секунд
         }
 
@@ -38,7 +38,7 @@ namespace DataBase.Tests
         public void AddPersonWithTask()
         {
             var sw = new Stopwatch();
-            var db = new TaskMaster.DataBaseFolder.DataBase();
+            var db = new TaskMasterBot.DataBaseFolder.DataBase();
             db.Clean();
             sw.Start();
             var person = new Person(1, new List<ITask>(), new List<ITask>(), new List<ITask>());

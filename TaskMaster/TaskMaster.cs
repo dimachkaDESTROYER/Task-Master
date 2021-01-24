@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TaskMaster.Domain;
+using TaskMasterBot.Domain;
 
-namespace TaskMaster
+namespace TaskMasterBot
 {
-    public class TaskMasters
+    public class TaskMaster
     {
         public IDataBase db;
-        public TaskMasters(IDataBase db) => this.db = db;
+        public TaskMaster(IDataBase db) => this.db = db;
 
         public void CreateSimpleTask(long id, string name, string description, DateTime deadline)
         {

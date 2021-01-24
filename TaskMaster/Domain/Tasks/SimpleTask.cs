@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace TaskMaster.Domain
+namespace TaskMasterBot.Domain
 {
     public class SimpleTask : ITask
     {

@@ -2,18 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TaskMaster;
-using TaskMaster.Domain;
-using TaskMaster.Domain.Tasks;
+using TaskMasterBot;
+using TaskMasterBot.Domain;
+using TaskMasterBot.Domain.Tasks;
 namespace DataBase.Tests
 {
     class TeamTests
     {
-        private TaskMaster.DataBaseFolder.DataBase db;
+        private TaskMasterBot.DataBaseFolder.DataBase db;
         [SetUp]
         public void Setup()
         {
-            db = new TaskMaster.DataBaseFolder.DataBase();
+            db = new TaskMasterBot.DataBaseFolder.DataBase();
             db.Clean();//долго создаётся, порядка 6 секунд
         }
 

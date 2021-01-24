@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TaskMaster
+namespace TaskMasterBot
 {
     public interface ITask
     {

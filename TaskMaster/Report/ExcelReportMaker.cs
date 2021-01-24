@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using TaskMaster.Domain;
-using TaskMaster.Domain.Tasks;
+using TaskMasterBot.Domain;
+using TaskMasterBot.Domain.Tasks;
 
-namespace TaskMaster.Report
+namespace TaskMasterBot.Report
 {
     public class ExcelReportMaker : IReportMaker
     {

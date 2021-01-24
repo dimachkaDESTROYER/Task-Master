@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Args;
-using TaskMaster;
+using TaskMasterBot;
 using Telegram.Bot.Types.ReplyMarkups;
-using TaskMaster.Domain;
-using TaskMaster.Report;
+using TaskMasterBot.Domain;
+using TaskMasterBot.Report;
 using Telegram.Bot.Types.InputFiles;
 
 namespace TelegramBot
@@ -30,11 +30,11 @@ namespace TelegramBot
         private Dictionary<long, ITask> usersTask = new Dictionary<long, ITask>();
         private Dictionary<long, string> userParam = new Dictionary<long, string>();
         private Dictionary<long, List<ITask>> tasksToReport = new Dictionary<long, List<ITask>>();
-        private readonly TaskMasters taskMasters;
+        private readonly TaskMaster taskMasters;
         private readonly IReportMaker reportMaker;
 
 
-        public TelegramTaskBot(TelegramBotClient bot, TaskMasters taskMasters, IReportMaker reportMaker)
+        public TelegramTaskBot(TelegramBotClient bot, TaskMaster taskMasters, IReportMaker reportMaker)
         {
             this.reportMaker = reportMaker;
             this.taskMasters = taskMasters;          

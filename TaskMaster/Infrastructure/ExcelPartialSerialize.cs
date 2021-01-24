@@ -2,7 +2,7 @@
 using System.Reflection;
 using OfficeOpenXml;
 
-namespace TaskMaster.Infrastructure
+namespace TaskMasterBot.Infrastructure
 {
     class ExcelPartialSerializatorFiller<T>
     {

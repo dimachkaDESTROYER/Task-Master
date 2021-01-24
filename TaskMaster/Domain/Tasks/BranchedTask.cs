@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TaskMaster.Domain.Tasks
+namespace TaskMasterBot.Domain.Tasks
 {
     public class SubTasks : List<ITask>
     {

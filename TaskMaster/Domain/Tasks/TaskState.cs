@@ -1,4 +1,4 @@
-﻿namespace TaskMaster
+﻿namespace TaskMasterBot
 {
     public enum TaskState
     {
