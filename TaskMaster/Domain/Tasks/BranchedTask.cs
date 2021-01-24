@@ -19,6 +19,7 @@ namespace TaskMasterBot.Domain.Tasks
     {
         public SubTasks SubTasks { get; private set; }
 
+        public void AddSubTask(ITask task) => SubTasks.Add(task);
         public BranchedTask(int id, IOwner owner, IPerformer performer, string topic, string description, List<ITask> subTasks)
             : base(id, owner, performer, topic, description)
         {
