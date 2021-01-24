@@ -12,10 +12,9 @@ namespace TaskMasterBot
         public static void Main()
         {
             var container = InitContainer();
-            var token = "1459735372:AAGXMBsw1dxlkl30XmlG0o1Cxwu_PvY_lA4"; /* <--- вставь токен */
-            var bot = new TelegramBotClient(token);
-            
-            var taskBot = new TelegramTaskBot(bot, container.Get<TaskMaster>(), container.Get<IReportMaker>());
+            var bot = container.Get<TelegramBotClient>();
+            var taskBot = container.Get<TelegramTaskBot>();
+
             bot.OnMessage += (sender, args) => taskBot.RecieveMessage(args, bot);
             bot.OnCallbackQuery += (sender, args) => taskBot.RecieveKeyButton(args, bot);
 
@@ -32,7 +31,8 @@ namespace TaskMasterBot
             container.Bind<TaskMaster>().ToSelf();
             container.Bind<TelegramBotClient>().ToSelf().InSingletonScope();
             container.Bind<TelegramTaskBot>().ToSelf().InSingletonScope();
-
+            container.Bind<string>().ToConstant("");// <-- вставь токен пожалуйста
+            container.Bind<System.Net.Http.HttpClient>().ToConstant(new System.Net.Http.HttpClient());
             return container;
         }
     }
