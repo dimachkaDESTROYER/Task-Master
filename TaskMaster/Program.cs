@@ -31,7 +31,7 @@ namespace TaskMasterBot
             container.Bind<TaskMaster>().ToSelf();
             container.Bind<TelegramBotClient>().ToSelf().InSingletonScope();
             container.Bind<TelegramTaskBot>().ToSelf().InSingletonScope();
-            container.Bind<string>().ToConstant("");// <-- вставь токен пожалуйста
+            container.Bind<string>().ToConstant("1459735372:AAGXMBsw1dxlkl30XmlG0o1Cxwu_PvY_lA4"); // <-- Вставь токен пожалуйста
             container.Bind<System.Net.Http.HttpClient>().ToConstant(new System.Net.Http.HttpClient());
             return container;
         }
