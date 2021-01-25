@@ -20,7 +20,6 @@ namespace TaskMasterBot.Report
             BranchedTaskProperties = GetProperties(typeof(BranchedTask));
         }
 
-        /* Возможно, лучше передавать Person или Team, тогда можно в имени файла указывать имя Team или Person */
         public string CreateTasksReport(List<ITask> tasks)
         {
             var currentDir = Directory.GetCurrentDirectory();

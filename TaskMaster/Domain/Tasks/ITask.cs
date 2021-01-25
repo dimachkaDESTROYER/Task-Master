@@ -12,7 +12,7 @@ namespace TaskMasterBot
         TaskState State { get; set; }
         DateTime? Start { get; set; }
         DateTime? Finish { get; set; }
-        DateTime? DeadLine { get; set; }
+        DateTime DeadLine { get; set; }
         bool TryPerform(IPerformer performer);
         bool TryTake(IPerformer performer);
     }

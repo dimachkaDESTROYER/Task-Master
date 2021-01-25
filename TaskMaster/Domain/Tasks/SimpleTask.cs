@@ -44,7 +44,7 @@ namespace TaskMasterBot.Domain
         public TaskState State { get; set; }
         public DateTime? Start { get; set; }
         public DateTime? Finish { get; set; }
-        public DateTime? DeadLine { get; set; }
+        public DateTime DeadLine { get; set; }
         public IPerformer Performer { get; set; }
         public IOwner Owner { get; }
 

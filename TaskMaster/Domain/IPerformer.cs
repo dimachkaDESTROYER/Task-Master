@@ -13,8 +13,6 @@ namespace TaskMasterBot
                 TakenTasks.Add(task);
         }
 
-        public void Untake(ITask task) => TakenTasks.Remove(task);
-
         public void Perform(ITask task)
         {
             if (!task.TryPerform(this)) return;

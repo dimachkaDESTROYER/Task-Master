@@ -8,9 +8,9 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Args;
 using TaskMasterBot;
 using Telegram.Bot.Types.ReplyMarkups;
-using TaskMasterBot.Domain;
 using TaskMasterBot.Report;
 using Telegram.Bot.Types.InputFiles;
+using TaskMasterBot.Domain.Tasks;
 
 namespace TelegramBot
 {
@@ -21,7 +21,8 @@ namespace TelegramBot
         ShowTask,
         EditTask,
         ChooseEdition,
-        ChangeStatus
+        ChangeStatus,
+        CreateSubTask
     }
 
     public class TelegramTaskBot
@@ -30,97 +31,125 @@ namespace TelegramBot
         private Dictionary<long, ITask> usersTask = new Dictionary<long, ITask>();
         private Dictionary<long, string> userParam = new Dictionary<long, string>();
         private Dictionary<long, List<ITask>> tasksToReport = new Dictionary<long, List<ITask>>();
-        private readonly TaskMaster taskMasters;
+        private readonly TaskMaster taskMaster;
         private readonly IReportMaker reportMaker;
 
-
-        public TelegramTaskBot(TelegramBotClient bot, TaskMaster taskMasters, IReportMaker reportMaker)
+        public TelegramTaskBot(TelegramBotClient bot, TaskMaster taskMaster, IReportMaker reportMaker)
         {
             this.reportMaker = reportMaker;
-            this.taskMasters = taskMasters;          
+            this.taskMaster = taskMaster;          
         }
 
         public async void RecieveKeyButton(CallbackQueryEventArgs args, TelegramBotClient bot)
         {
             var data = args.CallbackQuery.Data;
-            var name = args.CallbackQuery.Message.Chat.FirstName;
-            var namePerson = args.CallbackQuery.From.FirstName;
-            var id = args.CallbackQuery.Message.Chat.Id;
-            var idPerson = args.CallbackQuery.From.Id;
+            var chatId = args.CallbackQuery.Message.Chat.Id;
+            var personId = args.CallbackQuery.From.Id;
 
             if (data == "В процессе")
             {
-                var tasks = taskMasters.GetTakenTasks(id, name);
-                ShowYourTask(bot, id, tasks, data);
+                var tasks = taskMaster.GetTakenTasks(chatId);
+                ShowYourTask(bot, args, chatId, tasks, data);
             }
             else if (data == "Свободные")
             {
-                var tasks = taskMasters.GetOwnedTasks(id, name);
-                ShowYourTask(bot, id, tasks, data);
+                var tasks = taskMaster.GetOwnedTasks(chatId);
+                ShowYourTask(bot, args, chatId, tasks, data);
             }
             else if (data == "Решённые")
             {
-                var tasks = taskMasters.GetDoneTasks(id);
-                ShowYourTask(bot, id, tasks, data);
+                var tasks = taskMaster.GetDoneTasks(chatId);
+                ShowYourTask(bot, args, chatId, tasks, data);
             }
             else if (data == "Выполнить")
             {
-                /* Что лежит по индексу userTask[id] ? */
-                if (taskMasters.TryPerformTask(usersTask[id], id, idPerson))
-                    await bot.SendTextMessageAsync(id, $"Задача '{usersTask[id].Topic}' выполнена!");
-                else if (((Person)usersTask[id].Performer) != null)
-                    await bot.SendTextMessageAsync(id, $"Вы не можете выполнить задачу, её выполняет {((Person)usersTask[id].Performer).Name}!");
+                if (taskMaster.TryPerformTask(usersTask[chatId], chatId, personId))
+                    await bot.SendTextMessageAsync(chatId, $"Задача '{usersTask[chatId].Topic}' выполнена!");
+                else if (((Person)usersTask[chatId].Performer) != null)
+                    await bot.SendTextMessageAsync(chatId, $"Вы не можете выполнить задачу, её выполняет {((Person)usersTask[chatId].Performer).Name}!");
                 else
-                    await bot.SendTextMessageAsync(id, $"Вы не можете выполнить задачу, которую не взяли!");
+                    await bot.SendTextMessageAsync(chatId, $"Вы не можете выполнить задачу, которую не взяли!");
             }
             else if (data == "Взять себе")
             {
-                if (taskMasters.TryTakeTask(usersTask[id], idPerson))
-                    await bot.SendTextMessageAsync(id, $"Задача '{usersTask[id].Topic}' присвоена");
+                if (taskMaster.TryTakeTask(usersTask[chatId], personId))
+                    await bot.SendTextMessageAsync(chatId, $"Задача '{usersTask[chatId].Topic}' присвоена");
                 else
-                    await bot.SendTextMessageAsync(id, $"Вы не можете взять задачу '{usersTask[id].Topic}'");
+                    await bot.SendTextMessageAsync(chatId, $"Вы не можете взять задачу '{usersTask[chatId].Topic}'");
             }
             else if (data == "Удалить")
             {
-                if (taskMasters.TryDeleteTask(id, usersTask[id]))
-                    await bot.SendTextMessageAsync(id, $"Задача '{usersTask[id].Topic}' удалена из вашего списка!");
+                if (taskMaster.TryDeleteTask(chatId, usersTask[chatId]))
+                    await bot.SendTextMessageAsync(chatId, $"Задача '{usersTask[chatId].Topic}' удалена из вашего списка!");
                 else
-                    await bot.SendTextMessageAsync(id, $"Вы не можете удалить задачу '{usersTask[id].Topic}'!");
+                    await bot.SendTextMessageAsync(chatId, $"Вы не можете удалить задачу '{usersTask[chatId].Topic}'!");
             }
             else if (data == "\u270d\ud83c\udffb Отчёт")
             {
-                using (var stream = File.OpenRead(reportMaker.CreateTasksReport(tasksToReport[id])))
+                using (var stream = File.OpenRead(reportMaker.CreateTasksReport(tasksToReport[chatId])))
                 {
-                    InputOnlineFile iof = new InputOnlineFile(stream);
-                    iof.FileName = "Report.xlsx";
-                    var send = bot.SendDocumentAsync(id, iof, "Ваш отчёт");
+                    InputOnlineFile iof = new InputOnlineFile(stream)
+                    {
+                        FileName = "Report.xlsx"
+                    };
+                    var send = bot.SendDocumentAsync(chatId, iof, "Ваш отчёт");
                 }
             }
+            else if (data == "\u21a9\ufe0f")
+            {
+                if (usersState[chatId] == State.ChooseEdition)
+                    usersState[chatId] = State.EditTask;
 
-            else if (usersState[id] == State.ShowTask)
+                var keyboard = GetKeyboardListTasks();
+                await bot.EditMessageTextAsync(chatId, args.CallbackQuery.Message.MessageId, "Выберите список", replyMarkup: keyboard);
+            }
+
+            else if (usersState[chatId] == State.ShowTask)
             {
                 var idTask = int.Parse(args.CallbackQuery.Data);
-                var message = taskMasters.GetTask(idTask).ToString();
-                await bot.SendTextMessageAsync(id, message);
+                var task = taskMaster.GetTask(idTask);
+
+                var message = taskMaster.GetTask(idTask).ToString();
+                await bot.SendTextMessageAsync(chatId, message);
+                if (task is BranchedTask branchedTask)
+                {
+                    var subs = new List<List<InlineKeyboardButton>>();
+                    foreach(var t in branchedTask.SubTasks)
+                    {
+                        var taskButton = new List<InlineKeyboardButton>
+                        {
+                            InlineKeyboardButton.WithCallbackData(t.Topic, t.Id.ToString())
+                        };
+                        subs.Add(taskButton);
+                    }
+                    var keyboard = new InlineKeyboardMarkup(subs);
+                    await bot.SendTextMessageAsync(chatId, $"Подзадачи '{branchedTask.Topic}':", replyMarkup: keyboard);
+                }
             }
-            else if (usersState[id] == State.ChooseEdition)
+            else if (usersState[chatId] == State.ChooseEdition)
             {
                 var param = args.CallbackQuery.Data;
-                userParam[id] = param;
-                await bot.SendTextMessageAsync(id, $"Введите новое значение {param}");
+                userParam[chatId] = param;
+                await bot.SendTextMessageAsync(chatId, $"Введите новое значение {param}");
             }
-            else if (usersState[id] == State.EditTask)
+            else if (usersState[chatId] == State.EditTask)
             {
                 var idTask = int.Parse(args.CallbackQuery.Data);
-                usersState[id] = State.ChooseEdition;
-                usersTask[id] = taskMasters.GetTask(idTask);
-                EditTask(args, bot, usersTask[id]);
+                usersState[chatId] = State.ChooseEdition;
+                usersTask[chatId] = taskMaster.GetTask(idTask);
+                EditTask(args, bot, usersTask[chatId]);
             }
-            else if (usersState[id] == State.ChangeStatus)
+            else if (usersState[chatId] == State.CreateSubTask)
             {
                 var idTask = int.Parse(args.CallbackQuery.Data);
-                usersTask[id] = taskMasters.GetTask(idTask);
-                ChangeState(args, bot, id, usersTask[id].Topic);
+                usersTask[chatId] = taskMaster.GetTask(idTask);
+                await bot.SendTextMessageAsync(chatId, "Опишите подзадачу в формате: 'Название, Описание, Дедлайн (DD.MM.YYYY)'");
+            }
+            else if (usersState[chatId] == State.ChangeStatus)
+            {
+                var idTask = int.Parse(args.CallbackQuery.Data);
+                usersTask[chatId] = taskMaster.GetTask(idTask);
+                ChangeState(args, bot, chatId, usersTask[chatId].Topic);
             }
             await bot.AnswerCallbackQueryAsync(args.CallbackQuery.Id);
         }
@@ -134,10 +163,10 @@ namespace TelegramBot
                 InlineKeyboardButton.WithCallbackData("Удалить")
             };
             var keyboard = new InlineKeyboardMarkup(listButtons.ToArray());
-            await bot.SendTextMessageAsync(id, $"Что сделать с задачей '{taskName}'?", replyMarkup: keyboard);
+            await bot.EditMessageTextAsync(id, args.CallbackQuery.Message.MessageId, $"Что сделать с задачей '{taskName}'?", replyMarkup: keyboard);
         }
 
-        private async void ShowYourTask(TelegramBotClient bot, long id, List<ITask> tasks, string tasksName)
+        private async void ShowYourTask(TelegramBotClient bot, CallbackQueryEventArgs args, long id, List<ITask> tasks, string tasksName)
         {
             if (!tasks.Any())
             {
@@ -159,11 +188,16 @@ namespace TelegramBot
             {
                 InlineKeyboardButton.WithCallbackData("\u270d\ud83c\udffb Отчёт")
             };
+            var backButton = new List<InlineKeyboardButton> 
+            {
+                InlineKeyboardButton.WithCallbackData("\u21a9\ufe0f") 
+            };
             tasksToReport[id] = tasks;
 
             listTasks.Add(visualButton);
+            listTasks.Add(backButton);
             var keyboard = new InlineKeyboardMarkup(listTasks);
-            await bot.SendTextMessageAsync(id, $"'{tasksName}':", replyMarkup: keyboard);
+            await bot.EditMessageTextAsync(id, args.CallbackQuery.Message.MessageId, $"'{tasksName}':", replyMarkup: keyboard);
         }
 
         private async void EditTask(CallbackQueryEventArgs args, TelegramBotClient bot, ITask task)
@@ -171,7 +205,7 @@ namespace TelegramBot
             var tasksOptions = new List<List<InlineKeyboardButton>>();
             var options = task.GetType()
                               .GetProperties()
-                              .Where(p => p.PropertyType == typeof(string) || p.PropertyType == typeof(DateTime?));
+                              .Where(p => p.PropertyType == typeof(string) || p.PropertyType == typeof(DateTime));
             foreach (var option in options)
             {
                 var optionButton = new List<InlineKeyboardButton>
@@ -180,61 +214,44 @@ namespace TelegramBot
                 };
                 tasksOptions.Add(optionButton);
             }
+            var backButton = new List<InlineKeyboardButton>
+            {
+                InlineKeyboardButton.WithCallbackData("\u21a9\ufe0f")
+            };
+            tasksOptions.Add(backButton);
             var keyboard = new InlineKeyboardMarkup(tasksOptions.ToArray());
-            await bot.SendTextMessageAsync(args.CallbackQuery.Message.Chat.Id, $"Что изменить в {task.Topic}?", replyMarkup: keyboard);
+            await bot.EditMessageTextAsync(args.CallbackQuery.Message.Chat.Id,
+                                           args.CallbackQuery.Message.MessageId,
+                                           $"Что изменить в {task.Topic}?", replyMarkup: keyboard);
         }
 
-        private async void ChooseListTask(MessageEventArgs args, TelegramBotClient bot)
+        private InlineKeyboardMarkup GetKeyboardListTasks()
         {
-            var buttons = new List<InlineKeyboardButton>();
-            buttons.Add(InlineKeyboardButton.WithCallbackData("Свободные"));
-            buttons.Add(InlineKeyboardButton.WithCallbackData("В процессе"));
-            buttons.Add(InlineKeyboardButton.WithCallbackData("Решённые"));
-
-            var keyboard = new InlineKeyboardMarkup(buttons.ToArray());
-            await bot.SendTextMessageAsync(args.Message.Chat.Id, "Выберите список", replyMarkup: keyboard);
+            var buttons = new List<InlineKeyboardButton>
+            {
+                InlineKeyboardButton.WithCallbackData("Свободные"),
+                InlineKeyboardButton.WithCallbackData("В процессе"),
+                InlineKeyboardButton.WithCallbackData("Решённые")
+            };
+            return new InlineKeyboardMarkup(buttons.ToArray());
         }
 
         public async void RecieveMessage(MessageEventArgs args, TelegramBotClient bot)
         {
             var id = args.Message.Chat.Id;
-            string name = default;
-            if (id < 0)
-                name = args.Message.Chat.Title;
-            else
-                name = args.Message.From.FirstName;
+            var chatName = args.Message.Chat.Title;
+            var personName = args.Message.From.FirstName;
 
             if (id < 0)
             {
-                if (!taskMasters.db.ContainsTeam(id))
-                {
-                    var person = new Person(args.Message.From.Id, args.Message.From.FirstName);
-                    if (!taskMasters.db.ContainsPerson(args.Message.From.Id))
-                        taskMasters.db.AddPerson(person);
-
-                    var team = new Team(id, name);
-                    team.AddPerson(person);
-                    taskMasters.db.AddTeam(team);
-                }
-                else if (!taskMasters.db.ContainsPerson(args.Message.From.Id))
-                {
-                    var person = new Person(args.Message.From.Id, args.Message.From.FirstName);
-                    taskMasters.db.AddPerson(person);
-                    var team = taskMasters.db.GetTeam(id);
-                    team.AddPerson(person);
-                }
-                else
-                {
-                    var person = taskMasters.db.GetPerson(args.Message.From.Id);
-                    var team = taskMasters.db.GetTeam(id);
-                    team.AddPerson(person);
-                }
+                var personId = args.Message.From.Id;
+                taskMaster.MakeTeam(id, personId, personName, chatName);
             }
             else
-                if (!taskMasters.db.ContainsPerson(id))
-                    taskMasters.db.AddPerson(new Person(id, name));
+                taskMaster.MakePerson(id, personName);
 
-            Console.WriteLine($"{id} {name}");
+            Console.WriteLine($"{id}");
+
             if (!usersState.ContainsKey(id))
             {
                 usersState.Add(id, State.Nothing);
@@ -242,11 +259,6 @@ namespace TelegramBot
             }
 
             string message = "Введите команду";
-            if (args.Message.Type is MessageType.Sticker)
-            {
-                message = "Кто-то любит стикеры";
-                await bot.SendTextMessageAsync(id, message);
-            }
 
             if (args.Message.Type is MessageType.Text)
                 switch (args.Message.Text)
@@ -261,21 +273,32 @@ namespace TelegramBot
                     case "Изменить задачу":
                         {
                             usersState[id] = State.EditTask;
-                            ChooseListTask(args, bot);
+                            var keyboard = GetKeyboardListTasks();
+                            await bot.SendTextMessageAsync(args.Message.Chat.Id, "Выберите список", replyMarkup: keyboard);
                             break;
                         }
 
                     case "Показать список задач":
                         {
                             usersState[id] = State.ShowTask;
-                            ChooseListTask(args, bot);
+                            var keyboard = GetKeyboardListTasks();
+                            await bot.SendTextMessageAsync(args.Message.Chat.Id, "Выберите список", replyMarkup: keyboard);
+                            break;
+                        }
+
+                    case "Добавить подзадачу":
+                        {
+                            usersState[id] = State.CreateSubTask;
+                            var keyboard = GetKeyboardListTasks();
+                            await bot.SendTextMessageAsync(args.Message.Chat.Id, "Выберите список", replyMarkup: keyboard);
                             break;
                         }
 
                     case "Взять/Выполнить/Удалить задачу":
                         {
                             usersState[id] = State.ChangeStatus;
-                            ChooseListTask(args, bot);
+                            var keyboard = GetKeyboardListTasks();
+                            await bot.SendTextMessageAsync(args.Message.Chat.Id, "Выберите список", replyMarkup: keyboard);
                             break;
                         }
 
@@ -294,8 +317,24 @@ namespace TelegramBot
                             {
                                 var data = args.Message.Text.Split(',');
                                 var deadline = data[2].Split('.').Select(c => int.Parse(c)).ToArray();
-                                taskMasters.CreateSimpleTask(id, data[0], data[1],
+                                taskMaster.CreateSimpleTask(id, data[0], data[1],
                                                              new DateTime(deadline[2], deadline[1], deadline[0]));
+                                await bot.SendTextMessageAsync(id, "Задача добавлена");
+                            }
+                            catch
+                            {
+                                await bot.SendTextMessageAsync(id, "Задача введена в неверном формате!");
+                            }
+                        }
+                        else if (usersState[id] == State.CreateSubTask)
+                        {
+                            try
+                            {
+                                var data = args.Message.Text.Split(',');
+                                var deadline = data[2].Split('.').Select(c => int.Parse(c)).ToArray();
+
+                                taskMaster.CreateBranchedTask(usersTask[id], id, data[0], data[1],
+                                                           new DateTime(deadline[2], deadline[1], deadline[0]));
                                 await bot.SendTextMessageAsync(id, "Задача добавлена");
                             }
                             catch
@@ -307,7 +346,7 @@ namespace TelegramBot
                         {
                             try
                             {
-                                taskMasters.EditTask(usersTask[id], id, userParam[id], args.Message.Text);
+                                taskMaster.EditTask(usersTask[id], id, userParam[id], args.Message.Text);
                                 await bot.SendTextMessageAsync(id, $"У задачи '{usersTask[id].Topic}' изменен параметр '{userParam[id]}'");
                             }
                             catch
@@ -324,7 +363,6 @@ namespace TelegramBot
                             await bot.SendTextMessageAsync(id, message);
                         break;
                 };
-
         }
 
         private async Task MakeStartKeyboard(TelegramBotClient bot, long id)
@@ -333,16 +371,20 @@ namespace TelegramBot
             {
                 Keyboard = new[]
                 {
-                    new[] /* row 1 */
+                    new[]
                     {
                         new KeyboardButton("Создать новую задачу"),
                         new KeyboardButton("Изменить задачу")
                     },
-                    new[] /* row 2 */
+                    new[]
                     {
                         new KeyboardButton("Показать список задач"),
                         new KeyboardButton("Взять/Выполнить/Удалить задачу")
-                    }
+                    },
+                    new[]
+                    {
+                        new KeyboardButton("Добавить подзадачу")
+                    },
                 },
                 ResizeKeyboard = true
             };

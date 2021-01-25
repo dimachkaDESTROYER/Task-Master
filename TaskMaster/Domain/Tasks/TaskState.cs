@@ -4,6 +4,6 @@
     {
         Done,
         NotTaken,
-        InProcess,
+        InProcess
     }
 }

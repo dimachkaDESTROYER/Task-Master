@@ -12,7 +12,7 @@ namespace TaskMasterBot.Domain.Tasks
         public SubTasks() : base()
         { }
 
-        public override string ToString() => String.Join(',', this.Select(t => t.Topic));
+        public override string ToString() => String.Join(", ", this.Select(t => t.Topic));
     }
 
     public class BranchedTask : SimpleTask
